@@ -16,7 +16,7 @@
                     <ColumnDefinition Width="15" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
-                    <CheckBox Content="{Binding Process.ProcessName}" Margin="0 0 10 0" Checked="CheckBoxChecked" Unchecked="CheckBoxUnchecked"></CheckBox>
+                    <CheckBox Content="{Binding Process.ProcessName}" IsChecked="{Binding Checked}" Checked="CheckBoxChecked" Margin="0 0 10 0" Unchecked="CheckBoxUnchecked"></CheckBox>
                     <TextBlock Text="{Binding Process.Title,StringFormat=({0})}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
