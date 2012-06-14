@@ -32,6 +32,23 @@ namespace comScoreInc.DebugAttachHistory
             }
         }
 
+        private static string SelectedProcessesForAttach
+        {
+            get
+            {
+                if (!DebugAttachHistoryPackage.DTE.Globals.VariableExists["SelectedProcessesForAttach"])
+                {
+                    DebugAttachHistoryPackage.DTE.Globals["SelectedProcessesForAttach"] = string.Empty;
+                    DebugAttachHistoryPackage.DTE.Globals.VariablePersists["SelectedProcessesForAttach"] = true;
+                }
+                return DebugAttachHistoryPackage.DTE.Globals["SelectedProcessesForAttach"] as string;
+            }
+            set
+            {
+                DebugAttachHistoryPackage.DTE.Globals["SelectedProcessesForAttach"] = value;
+            }
+        }
+
         #endregion        
 
         #region Constructors
@@ -62,7 +79,7 @@ namespace comScoreInc.DebugAttachHistory
             if (!lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Process == lstSearchProcesses.SelectedItem).Any())
             {
                 var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;
-                lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc,Checked=false});                
+                lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });                
                 AddToGlobals(selectedProc.Hash.ToString());   
             }
         }        
@@ -128,7 +145,7 @@ namespace comScoreInc.DebugAttachHistory
                     var procss = _processes.Where(pp => string.Compare(pp.Hash.ToString(),hash,true) == 0).ToList();
                     foreach (var p in procss)
                     {
-                        lstAttachProcesses.Items.Add(new ProcessToBeAttached {Process = p, Checked = false});
+                        lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash.ToString()) });
                     }
                 }   
             }            
@@ -145,12 +162,14 @@ namespace comScoreInc.DebugAttachHistory
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = true;
+            AddToSolutionGlobals(p.Process.Hash.ToString());
         }
 
         private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = false;
+            RemoveFromSolutionGlobals(p.Process.Hash.ToString());
         }
 
         #endregion
@@ -158,23 +177,56 @@ namespace comScoreInc.DebugAttachHistory
         #region Helper methods
 
         private static void AddToGlobals(string processHash)
-        {
-            if (string.IsNullOrEmpty(ProcessesForAttach))
-            {
-                ProcessesForAttach = processHash; 
-            }
-            else
-            {
-                ProcessesForAttach += string.Concat(",", processHash);   
-            }            
+        {            
+            ProcessesForAttach = AddToCommaString(processHash, ProcessesForAttach);         
         }
 
         private static void RemoveFromGlobals(string processHash)
         {
-            if (!string.IsNullOrEmpty(ProcessesForAttach))
+            ProcessesForAttach = RemoveFromCommaString(processHash, ProcessesForAttach);         
+        }
+
+        private static void AddToSolutionGlobals(string processHash)
+        {
+            SelectedProcessesForAttach = AddToCommaString(processHash, SelectedProcessesForAttach);
+        }
+
+        private static void RemoveFromSolutionGlobals(string processHash)
+        {
+            SelectedProcessesForAttach = RemoveFromCommaString(processHash, SelectedProcessesForAttach);
+        }
+
+        private static bool IsChecked(string processHash)
+        {
+            foreach (var p in SelectedProcessesForAttach.Split(','))
+            {
+                if (p == processHash)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static string AddToCommaString(string processHash, string s)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                s = processHash; 
+            }
+            else
+            {
+                s += string.Concat(",", processHash);   
+            }
+            return s;
+        }
+
+        private static string RemoveFromCommaString(string processHash, string s)
+        {
+            if (!string.IsNullOrEmpty(s))
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (var p in ProcessesForAttach.Split(','))
+                foreach (var p in s.Split(','))
                 {
                     if (p!=processHash)
                     {
@@ -185,9 +237,10 @@ namespace comScoreInc.DebugAttachHistory
                 {
                     sb.Remove(sb.Length - 1, 1);   
                 }                
-                ProcessesForAttach = sb.ToString();
+                return sb.ToString();
             }
-        }
+            return string.Empty;
+        }      
 
         #endregion
 
@@ -195,6 +248,6 @@ namespace comScoreInc.DebugAttachHistory
 
         private List<ProcessExt> _processes;
 
-        #endregion
+        #endregion        
     }
 }
