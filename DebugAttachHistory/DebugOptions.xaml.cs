@@ -116,8 +116,16 @@ namespace comScoreInc.DebugAttachHistory
             var selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p=>p.Checked).ToList();
             if (selectedProc.Count == 0)
             {
-                MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error",MessageBoxButton.OK,MessageBoxImage.Error);
-                return;
+                if (!IsLoaded)
+                {
+                    MyToolWindowLoaded(sender, e);
+                    selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+                }
+                if (selectedProc.Count == 0)
+                {
+                    MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;   
+                }                
             }
             bool found = false;
             foreach (EnvDTE.Process proc in processes)
