@@ -2,7 +2,7 @@
 // MUST match PkgCmdID.h
 using System;
 
-namespace comScoreInc.DebugAttachManager
+namespace Karpach.DebugAttachManager
 {
     static class PkgCmdIDList
     {

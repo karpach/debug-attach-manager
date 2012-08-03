@@ -1,4 +1,4 @@
-﻿namespace comScoreInc.DebugAttachManager
+﻿namespace Karpach.DebugAttachManager
 {
     class ProcessToBeAttached
     {

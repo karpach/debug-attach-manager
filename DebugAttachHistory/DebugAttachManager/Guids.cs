@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace comScoreInc.DebugAttachManager
+namespace Karpach.DebugAttachManager
 {
     static class GuidList
     {
