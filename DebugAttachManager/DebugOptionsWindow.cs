@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
 
-namespace comScoreInc.DebugAttachManager
+namespace Karpach.DebugAttachManager
 {
     /// <summary>
     /// This class implements the tool window exposed by this package and hosts a user control.

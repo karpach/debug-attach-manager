@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
 
-namespace comScoreInc.DebugAttachManager
+namespace Karpach.DebugAttachManager
 {
     /// <summary>
     /// Interaction logic for DebugOptionsControl.xaml

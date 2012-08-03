@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Management;
 
-namespace comScoreInc.DebugAttachManager
+namespace Karpach.DebugAttachManager
 {
     public class ProcessExt
     {
