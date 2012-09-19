@@ -3,7 +3,7 @@
   <Identifier Id="facf6f74-1cc6-44be-b57d-115d48b28821">
     <Name>Debug Attach Manager</Name>
     <Author>Viktar Karpach</Author>
-    <Version>1.2.10803.0</Version>
+    <Version>1.2.10919.0</Version>
     <Description xml:space="preserve">Extension provides extended abilities to attach Visual Studio debuger to web application pools, windows services and other processes.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://www.karpach.com</MoreInfoUrl>
