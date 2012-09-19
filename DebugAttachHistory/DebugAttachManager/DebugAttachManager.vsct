@@ -73,9 +73,17 @@
         </Strings>
       </Button>
 
-
       <Button guid="guidDebugAttachManagerCmdSet" id="cmdidAttachSmartDebug" priority="0x0600" type="Button">
         <Parent guid="guidDebugAttachManagerCmdSet" id="MyMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <CommandName>cmdidAttachSmartDebug</CommandName>
+          <ButtonText>Attach Smart Debug Selections</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidDebugAttachManagerCmdSet" id="cmdidAttachSmartDebug" priority="0x0200" type="Button">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_TOOLSB_RUNBUILD"/>
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <CommandName>cmdidAttachSmartDebug</CommandName>
