@@ -78,7 +78,14 @@ namespace Karpach.DebugAttachManager
             var attachWindow = window as DebugOptionsWindow;
             if (attachWindow != null)
             {
-                attachWindow.AttachToProcesses();
+                if (!attachWindow.AttachToProcesses())
+                {
+                    var windowFrame = attachWindow.Frame as IVsWindowFrame;
+                    if (windowFrame != null)
+                    {
+                        windowFrame.Show();
+                    }
+                }
             }
         }
 

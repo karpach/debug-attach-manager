@@ -65,9 +65,9 @@ namespace Karpach.DebugAttachManager
 
         #region Public Methods
 
-        public void AttachToProcesses()
+        public bool AttachToProcesses()
         {
-            BtnAttachClick(this, null);
+            return Attach(this, null);
         }
 
         #endregion
@@ -111,9 +111,14 @@ namespace Karpach.DebugAttachManager
         }
 
         private void BtnAttachClick(object sender, RoutedEventArgs e)
-        {               
+        {
+            Attach(sender,e);
+        }
+
+        private bool Attach(object sender, RoutedEventArgs e)
+        {
             EnvDTE.Processes processes = DebugAttachManagerPackage.DTE.Debugger.LocalProcesses;
-            var selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p=>p.Checked).ToList();
+            var selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
             if (selectedProc.Count == 0)
             {
                 if (!IsLoaded)
@@ -124,14 +129,14 @@ namespace Karpach.DebugAttachManager
                 if (selectedProc.Count == 0)
                 {
                     MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;   
-                }                
+                    return false;
+                }
             }
             bool found = false;
             foreach (EnvDTE.Process proc in processes)
-            {                
+            {
                 ProcessExt pp = new ProcessExt(Process.GetProcessById(proc.ProcessID));
-                if (selectedProc.Exists(p=> pp.Hash == p.Process.Hash))                
+                if (selectedProc.Exists(p => pp.Hash == p.Process.Hash))
                 {
                     proc.Attach();
                     found = true;
@@ -140,8 +145,10 @@ namespace Karpach.DebugAttachManager
             if (!found)
             {
                 MessageBox.Show("Selected processes are not running.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
-        }               
+            return true;
+        }
 
         private void MyToolWindowLoaded(object sender, RoutedEventArgs e)
         {            
