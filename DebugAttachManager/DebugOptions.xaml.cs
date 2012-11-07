@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
+using Karpach.DebugAttachManager.Properties;
 
 namespace Karpach.DebugAttachManager
 {
@@ -78,9 +79,9 @@ namespace Karpach.DebugAttachManager
         {
             if (!lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Process == lstSearchProcesses.SelectedItem).Any())
             {
-                var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;
+                var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;                
                 lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });                
-                AddToGlobals(selectedProc.Hash.ToString());   
+                AddToGlobals(selectedProc.Hash);   
             }
         }        
 
@@ -169,7 +170,7 @@ namespace Karpach.DebugAttachManager
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((Button)sender).DataContext;
-            RemoveFromGlobals(p.Process.Hash.ToString());
+            RemoveFromGlobals(p.Process.Hash);
             lstAttachProcesses.Items.Remove(p);
         }
 
@@ -177,38 +178,38 @@ namespace Karpach.DebugAttachManager
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = true;
-            AddToSolutionGlobals(p.Process.Hash.ToString());
+            AddToSolutionGlobals(p.Process.Hash);
         }
 
         private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = false;
-            RemoveFromSolutionGlobals(p.Process.Hash.ToString());
+            RemoveFromSolutionGlobals(p.Process.Hash);
         }
 
         #endregion
 
         #region Helper methods
 
-        private static void AddToGlobals(string processHash)
+        private static void AddToGlobals(int processHash)
         {            
-            ProcessesForAttach = AddToCommaString(processHash, ProcessesForAttach);         
+            AddToCommaString(processHash,false);         
         }
 
-        private static void RemoveFromGlobals(string processHash)
+        private static void RemoveFromGlobals(int processHash)
         {
-            ProcessesForAttach = RemoveFromCommaString(processHash, ProcessesForAttach);         
+            RemoveFromCommaString(processHash);         
         }
 
-        private static void AddToSolutionGlobals(string processHash)
+        private static void AddToSolutionGlobals(int processHash)
         {
-            SelectedProcessesForAttach = AddToCommaString(processHash, SelectedProcessesForAttach);
+            AddToCommaString(processHash, true);
         }
 
-        private static void RemoveFromSolutionGlobals(string processHash)
+        private static void RemoveFromSolutionGlobals(int processHash)
         {
-            SelectedProcessesForAttach = RemoveFromCommaString(processHash, SelectedProcessesForAttach);
+            RemoveFromCommaString(processHash);
         }
 
         private static bool IsChecked(string processHash)
@@ -223,38 +224,24 @@ namespace Karpach.DebugAttachManager
             return false;
         }
 
-        private static string AddToCommaString(string processHash, string s)
+        private static void AddToCommaString(int processHash, bool selected)
         {
-            if (string.IsNullOrEmpty(s))
+            if (Settings.Default.Processes.ContainsKey(processHash))
             {
-                s = processHash; 
+                Settings.Default.Processes[processHash] = selected;   
             }
             else
             {
-                s += string.Concat(",", processHash);   
+                Settings.Default.Processes.Add(processHash,selected);
             }
-            return s;
         }
 
-        private static string RemoveFromCommaString(string processHash, string s)
+        private static void RemoveFromCommaString(int processHash)
         {
-            if (!string.IsNullOrEmpty(s))
+            if (Settings.Default.Processes.ContainsKey(processHash))
             {
-                StringBuilder sb = new StringBuilder();
-                foreach (var p in s.Split(','))
-                {
-                    if (p!=processHash)
-                    {
-                        sb.AppendFormat("{0},", p);
-                    }
-                }
-                if (sb.Length>0)
-                {
-                    sb.Remove(sb.Length - 1, 1);   
-                }                
-                return sb.ToString();
+                Settings.Default.Processes.Remove(processHash);
             }
-            return string.Empty;
         }      
 
         #endregion
