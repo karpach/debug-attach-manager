@@ -33,23 +33,6 @@ namespace Karpach.DebugAttachManager
             }
         }
 
-        private static string SelectedProcessesForAttach
-        {
-            get
-            {
-                if (!DebugAttachManagerPackage.DTE.Globals.VariableExists["SelectedProcessesForAttach"])
-                {
-                    DebugAttachManagerPackage.DTE.Globals["SelectedProcessesForAttach"] = string.Empty;
-                    DebugAttachManagerPackage.DTE.Globals.VariablePersists["SelectedProcessesForAttach"] = true;
-                }
-                return DebugAttachManagerPackage.DTE.Globals["SelectedProcessesForAttach"] as string;
-            }
-            set
-            {
-                DebugAttachManagerPackage.DTE.Globals["SelectedProcessesForAttach"] = value;
-            }
-        }
-
         #endregion        
 
         #region Constructors
@@ -80,8 +63,8 @@ namespace Karpach.DebugAttachManager
             if (!lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Process == lstSearchProcesses.SelectedItem).Any())
             {
                 var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;                
-                lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });                
-                AddToGlobals(selectedProc.Hash);   
+                lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });
+                SaveProcessHash(selectedProc.Hash,false);
             }
         }        
 
@@ -153,15 +136,16 @@ namespace Karpach.DebugAttachManager
 
         private void MyToolWindowLoaded(object sender, RoutedEventArgs e)
         {            
-            if (!string.IsNullOrEmpty(ProcessesForAttach) && lstAttachProcesses.Items.Count==0)
+
+            if (lstAttachProcesses.Items.Count==0)
             {
-                foreach (var pHash in ProcessesForAttach.Split(','))
+                foreach (var pHash in Settings.Default.Processes.Keys)
                 {
-                    string hash = pHash;
-                    var procss = _processes.Where(pp => string.Compare(pp.Hash.ToString(),hash,true) == 0).ToList();
+                    int hash = pHash;
+                    var procss = _processes.Where(pp => pp.Hash == hash).ToList();
                     foreach (var p in procss)
                     {
-                        lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash.ToString()) });
+                        lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash) });
                     }
                 }   
             }            
@@ -170,7 +154,7 @@ namespace Karpach.DebugAttachManager
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((Button)sender).DataContext;
-            RemoveFromGlobals(p.Process.Hash);
+            DeleteProcessHash(p.Process.Hash);
             lstAttachProcesses.Items.Remove(p);
         }
 
@@ -178,53 +162,27 @@ namespace Karpach.DebugAttachManager
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = true;
-            AddToSolutionGlobals(p.Process.Hash);
+            SaveProcessHash(p.Process.Hash, true);
         }
 
         private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = false;
-            RemoveFromSolutionGlobals(p.Process.Hash);
+            DeleteProcessHash(p.Process.Hash);
         }
 
         #endregion
 
         #region Helper methods
 
-        private static void AddToGlobals(int processHash)
-        {            
-            AddToCommaString(processHash,false);         
-        }
-
-        private static void RemoveFromGlobals(int processHash)
+        private static bool IsChecked(int processHash)
         {
-            RemoveFromCommaString(processHash);         
+            return Settings.Default.Processes.ContainsKey(processHash) && Settings.Default.Processes[processHash];
+
         }
 
-        private static void AddToSolutionGlobals(int processHash)
-        {
-            AddToCommaString(processHash, true);
-        }
-
-        private static void RemoveFromSolutionGlobals(int processHash)
-        {
-            RemoveFromCommaString(processHash);
-        }
-
-        private static bool IsChecked(string processHash)
-        {
-            foreach (var p in SelectedProcessesForAttach.Split(','))
-            {
-                if (p == processHash)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static void AddToCommaString(int processHash, bool selected)
+        private static void SaveProcessHash(int processHash, bool selected)
         {
             if (Settings.Default.Processes.ContainsKey(processHash))
             {
@@ -236,7 +194,7 @@ namespace Karpach.DebugAttachManager
             }
         }
 
-        private static void RemoveFromCommaString(int processHash)
+        private static void DeleteProcessHash(int processHash)
         {
             if (Settings.Default.Processes.ContainsKey(processHash))
             {
