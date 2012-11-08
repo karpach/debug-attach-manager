@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,28 +13,7 @@ namespace Karpach.DebugAttachManager
     /// Interaction logic for DebugOptionsControl.xaml
     /// </summary>
     public partial class DebugOptionsControl
-    {
-        #region Public Properties
-
-        private static string ProcessesForAttach
-        {
-            get
-            {                  
-                if (!DebugAttachManagerPackage.DTE.Globals.VariableExists["ProcessesForAttach"])
-                {
-                    DebugAttachManagerPackage.DTE.Globals["ProcessesForAttach"] = string.Empty;
-                    DebugAttachManagerPackage.DTE.Globals.VariablePersists["ProcessesForAttach"] = true;
-                }                
-                return DebugAttachManagerPackage.DTE.Globals["ProcessesForAttach"] as string;
-            } 
-            set
-            {
-                DebugAttachManagerPackage.DTE.Globals["ProcessesForAttach"] = value;
-            }
-        }
-
-        #endregion        
-
+    {               
         #region Constructors
 
         public DebugOptionsControl()
@@ -60,7 +39,7 @@ namespace Karpach.DebugAttachManager
 
         private void LstSearchProcessesMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (!lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Process == lstSearchProcesses.SelectedItem).Any())
+            if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(p => p.Process != lstSearchProcesses.SelectedItem))
             {
                 var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;                
                 lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });
@@ -136,7 +115,6 @@ namespace Karpach.DebugAttachManager
 
         private void MyToolWindowLoaded(object sender, RoutedEventArgs e)
         {            
-
             if (lstAttachProcesses.Items.Count==0)
             {
                 foreach (var pHash in Settings.Default.Processes.Keys)
@@ -169,7 +147,7 @@ namespace Karpach.DebugAttachManager
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = false;
-            DeleteProcessHash(p.Process.Hash);
+            SaveProcessHash(p.Process.Hash,false);
         }
 
         #endregion
@@ -179,7 +157,6 @@ namespace Karpach.DebugAttachManager
         private static bool IsChecked(int processHash)
         {
             return Settings.Default.Processes.ContainsKey(processHash) && Settings.Default.Processes[processHash];
-
         }
 
         private static void SaveProcessHash(int processHash, bool selected)
@@ -192,6 +169,7 @@ namespace Karpach.DebugAttachManager
             {
                 Settings.Default.Processes.Add(processHash,selected);
             }
+            Settings.Default.Save();
         }
 
         private static void DeleteProcessHash(int processHash)
@@ -199,6 +177,7 @@ namespace Karpach.DebugAttachManager
             if (Settings.Default.Processes.ContainsKey(processHash))
             {
                 Settings.Default.Processes.Remove(processHash);
+                Settings.Default.Save();
             }
         }      
 

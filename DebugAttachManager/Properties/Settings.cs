@@ -1,37 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell.Settings;
 
 namespace Karpach.DebugAttachManager.Properties
 {
-    internal sealed class Settings : ApplicationSettingsBase
+    internal sealed class Settings
     {
-        [UserScopedSetting]
-        [SettingsSerializeAs(SettingsSerializeAs.Xml)]
-        [DefaultSettingValue("")]
+        private Dictionary<int, bool> _processes;
+        private WritableSettingsStore _settingsStore;
+
+        public Settings(IServiceProvider provider)
+        {
+            SettingsManager settingsManager = new ShellSettingsManager(provider);
+            _settingsStore = settingsManager.GetWritableSettingsStore(SettingsScope.UserSettings);
+            if (!_settingsStore.CollectionExists("Processes"))
+            {
+                _settingsStore.CreateCollection("Processes");
+            }
+            IEnumerable<string> services = _settingsStore.GetSubCollectionNames("Processes");            
+            foreach (var s in services)
+            {
+                //_settingsStore.SetString();
+            }
+        }
+
         public Dictionary<int,bool> Processes
         {
             get
             {
-                return (Dictionary<int, bool>)(this["Processes"] ?? (this["Processes"] = new Dictionary<int, bool>()));
+                return _processes ?? (_processes = new Dictionary<int, bool>());
             }
             set
             {
-                this["Processes"] = value;
+                _processes = value;
             }
         }        
-
-        private static Settings _default;
-        public static Settings Default 
-        { 
-            get
-            {
-                if (_default == null)
-                {
-                    _default = new Settings();
-                    _default.Reload();
-                }
-                return _default;
-            }            
-        }
     }
 }
