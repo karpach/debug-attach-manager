@@ -3,11 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using System.Windows.Forms;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 
 namespace Karpach.DebugAttachManager
@@ -35,7 +31,8 @@ namespace Karpach.DebugAttachManager
     [Guid(GuidList.guidDebugAttachManagerPkgString)]
     public sealed class DebugAttachManagerPackage : Package
     {
-        public static EnvDTE80.DTE2 DTE;        
+        public static EnvDTE80.DTE2 DTE;
+        public static IServiceProvider ServiceProvider;        
 
         /// <summary>
         /// Default constructor of the package.
@@ -116,6 +113,7 @@ namespace Karpach.DebugAttachManager
                 mcs.AddCommand(menuToolWin);
             }
             DTE = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
+            ServiceProvider = this;
         }
         #endregion
 

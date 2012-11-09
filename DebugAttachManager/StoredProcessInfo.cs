@@ -1,11 +1,16 @@
 ﻿using System;
 
 namespace Karpach.DebugAttachManager
-{
-    [Serializable]
+{    
     public class StoredProcessInfo
     {
-        public int Hash { get; set; }
+        public string ProcessName { get; set; }
+        public string Title { get; set; }
         public bool Selected { get; set; }
+
+        public int Hash
+        {
+            get { return string.Concat(ProcessName, Title).GetHashCode(); }
+        }
     }
 }

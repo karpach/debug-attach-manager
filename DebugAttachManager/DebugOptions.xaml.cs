@@ -19,7 +19,7 @@ namespace Karpach.DebugAttachManager
         public DebugOptionsControl()
         {
             InitializeComponent();            
-            _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
+            _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();            
             lstSearchProcesses.ItemsSource = _processes;            
             rbnAll.Checked+=RbnAllChecked;
         }
@@ -41,9 +41,10 @@ namespace Karpach.DebugAttachManager
         {
             if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(p => p.Process != lstSearchProcesses.SelectedItem))
             {
-                var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;                
-                lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = selectedProc, Checked = false });
-                SaveProcessHash(selectedProc.Hash,false);
+                var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;
+                var p = new ProcessToBeAttached {Process = selectedProc, Checked = false};
+                lstAttachProcesses.Items.Add(p);
+                SaveProcessHash(p);
             }
         }        
 
@@ -140,14 +141,14 @@ namespace Karpach.DebugAttachManager
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = true;
-            SaveProcessHash(p.Process.Hash, true);
+            SaveProcessHash(p);
         }
 
         private void CheckBoxUnchecked(object sender, RoutedEventArgs e)
         {
             var p = (ProcessToBeAttached)((CheckBox)sender).DataContext;
             p.Checked = false;
-            SaveProcessHash(p.Process.Hash,false);
+            SaveProcessHash(p);
         }
 
         #endregion
@@ -156,18 +157,23 @@ namespace Karpach.DebugAttachManager
 
         private static bool IsChecked(int processHash)
         {
-            return Settings.Default.Processes.ContainsKey(processHash) && Settings.Default.Processes[processHash];
+            return Settings.Default.Processes.ContainsKey(processHash) && Settings.Default.Processes[processHash].Selected;
         }
 
-        private static void SaveProcessHash(int processHash, bool selected)
+        private static void SaveProcessHash(ProcessToBeAttached process)
         {
-            if (Settings.Default.Processes.ContainsKey(processHash))
+            if (Settings.Default.Processes.ContainsKey(process.Process.Hash))
             {
-                Settings.Default.Processes[processHash] = selected;   
+                Settings.Default.Processes[process.Process.Hash].Selected = process.Checked;   
             }
             else
             {
-                Settings.Default.Processes.Add(processHash,selected);
+                Settings.Default.Processes.Add(process.Process.Hash, new StoredProcessInfo
+                                                                         {
+                                                                             Title = process.Process.Title,
+                                                                             ProcessName = process.Process.ProcessName,
+                                                                             Selected = process.Checked
+                                                                         });
             }
             Settings.Default.Save();
         }
@@ -185,8 +191,8 @@ namespace Karpach.DebugAttachManager
 
         #region Private Variables
 
-        private List<ProcessExt> _processes;
+        private List<ProcessExt> _processes;        
 
-        #endregion        
+        #endregion
     }
 }
