@@ -7,15 +7,24 @@ namespace Karpach.DebugAttachManager
     {
         private readonly Process _process;
         private string _title;
+        private readonly string _processName;
 
         public ProcessExt(Process process)
         {
+            _processName = process.ProcessName;
             _process = process;
+        }
+
+
+        public ProcessExt(string processName, string title)
+        {
+            _title = title;
+            _processName = processName;
         }
 
         public string ProcessName
         {
-            get { return _process.ProcessName; }
+            get { return _processName; }
         }
 
         public string Title
@@ -25,11 +34,15 @@ namespace Karpach.DebugAttachManager
 
         public int Hash
         {
-            get { return string.Concat(_process.ProcessName, Title).GetHashCode(); }
+            get { return string.Concat(ProcessName, Title).GetHashCode(); }
         }
 
         private string GetAppPoolName()
         {
+            if (_process == null)
+            {
+                return string.Empty;
+            }
             if (string.Compare(_process.ProcessName, "w3wp", true) == 0)
             {                            
                 ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");

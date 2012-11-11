@@ -108,7 +108,7 @@ namespace Karpach.DebugAttachManager
             }
             if (!found)
             {
-                MessageBox.Show("Selected processes are not running.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Selected processes are not running. Try to run your application first.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
             return true;
@@ -121,10 +121,20 @@ namespace Karpach.DebugAttachManager
                 foreach (var pHash in Settings.Default.Processes.Keys)
                 {
                     int hash = pHash;
-                    var procss = _processes.Where(pp => pp.Hash == hash).ToList();
-                    foreach (var p in procss)
+                    var processes = _processes.Where(pp => pp.Hash == hash).ToList();
+                    if (processes.Count > 0)
                     {
-                        lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash) });
+                        foreach (var p in processes)
+                        {
+                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash) });
+                        }   
+                    }
+                    else
+                    {
+                        lstAttachProcesses.Items.Add(new ProcessToBeAttached {
+                            Process = new ProcessExt(Settings.Default.Processes[pHash].ProcessName, Settings.Default.Processes[pHash].Title), 
+                            Checked = IsChecked(hash) 
+                        });
                     }
                 }   
             }            
