@@ -37,13 +37,14 @@ namespace Karpach.DebugAttachManager
             base.Content = new DebugOptionsControl();
         }
 
-        public void AttachToProcesses()
+        public bool AttachToProcesses()
         {
             DebugOptionsControl control = base.Content as DebugOptionsControl;
             if (control != null)
             {
-                control.AttachToProcesses();
+                return control.AttachToProcesses();
             }
+            return false;
         }
     }
 }
