@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,8 +22,7 @@ namespace Karpach.DebugAttachManager
         {
             InitializeComponent();            
             _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();            
-            lstSearchProcesses.ItemsSource = _processes;            
-            rbnAll.Checked+=RbnAllChecked;
+            lstSearchProcesses.ItemsSource = _processes;                        
         }
 
         #endregion
@@ -50,15 +51,43 @@ namespace Karpach.DebugAttachManager
 
         private void RbnDevChecked(object sender, RoutedEventArgs e)
         {
+            btnIIS.IsChecked = false;            
             _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev")).Select(p=>new ProcessExt(p)).ToList();
             lstSearchProcesses.ItemsSource = _processes;
         }
 
+        private void RbnDevUnChecked(object sender, RoutedEventArgs e)
+        {
+            RbnAllChecked(sender, e);
+        }
+
         private void RbnIisChecked(object sender, RoutedEventArgs e)
         {
+            btnDev.IsChecked = false;            
             _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("w3wp")).Select(p => new ProcessExt(p)).ToList();
             lstSearchProcesses.ItemsSource = _processes;
-        }       
+        }
+
+        private void RbnIisUnChecked(object sender, RoutedEventArgs e)
+        {
+            RbnAllChecked(sender, e);
+        }
+
+        private void BtnRefreshClick(object sender, RoutedEventArgs e)
+        {            
+            if (btnIIS.IsChecked)
+            {
+                RbnIisChecked(sender,e);
+            } 
+            else if (btnDev.IsChecked)
+            {
+                RbnDevChecked(sender, e);
+            }
+            else
+            {
+                RbnAllChecked(sender, e);
+            }                        
+        }        
 
         private void RbnAllChecked(object sender, RoutedEventArgs e)
         {
@@ -76,7 +105,7 @@ namespace Karpach.DebugAttachManager
 
         private void BtnAttachClick(object sender, RoutedEventArgs e)
         {
-            Attach(sender,e);
+            Attach(sender,e);            
         }
 
         private bool Attach(object sender, RoutedEventArgs e)
@@ -203,6 +232,6 @@ namespace Karpach.DebugAttachManager
 
         private List<ProcessExt> _processes;        
 
-        #endregion
+        #endregion        
     }
 }

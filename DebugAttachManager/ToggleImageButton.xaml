@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Karpach.DebugAttachManager.ToggleImageButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.10.0"
+             mc:Ignorable="d" 
+             x:Name="root"
+             d:DesignHeight="26" d:DesignWidth="100">    
+    <Grid>
+        <ToggleButton Checked="ToggleButtonChecked" Unchecked="ToggleButtonUnChecked" IsChecked="{Binding Path=IsChecked, ElementName=root}">
+            <ToggleButton.Template>
+                <ControlTemplate TargetType="ToggleButton">
+                    <StackPanel x:Name="Container"  Orientation="Horizontal" Margin="2,3,2,3">
+                        <Image Source="{Binding Path=Image, ElementName=root}" Width="16" Margin="3,0,0,0"/>
+                        <TextBlock Text="{Binding Path=Text, ElementName=root}" Height="Auto" VerticalAlignment="Center" Padding="6,0,3,2" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="true">
+                            <Setter TargetName="Container" Property="Background" Value="{DynamicResource {x:Static Shell:VsBrushes.CommandBarSelectedKey}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </ToggleButton.Template>
+        </ToggleButton>
+    </Grid>
+</UserControl>
