@@ -133,6 +133,9 @@
     </Compile>
     <Compile Include="DebugOptionsWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="ImageButton.xaml.cs">
+      <DependentUpon>ImageButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProcessExt.cs" />
     <Compile Include="ProcessToBeAttached.cs" />
     <Compile Include="Properties\Settings.cs" />
@@ -146,6 +149,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="StoredProcessInfo.cs" />
+    <Compile Include="ToggleImageButton.xaml.cs">
+      <DependentUpon>ToggleImageButton.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -167,6 +173,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\attach.png" />
+    <Resource Include="Resources\bug.ico" />
+    <Resource Include="Resources\iis.png" />
+    <Resource Include="Resources\local.png" />
+    <Resource Include="Resources\refresh.png" />
+    <Resource Include="Resources\Images_24bit.bmp" />
     <Content Include="ru-RU\Extension.vsixlangpack">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -191,6 +203,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="DebugOptions.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ImageButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ToggleImageButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
