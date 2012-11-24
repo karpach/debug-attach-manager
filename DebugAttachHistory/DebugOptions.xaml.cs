@@ -43,7 +43,7 @@ namespace Karpach.DebugAttachManager
             if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(p => p.Process != lstSearchProcesses.SelectedItem))
             {
                 var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;
-                var p = new ProcessToBeAttached {Process = selectedProc, Checked = false};
+                var p = new ProcessToBeAttached {Process = selectedProc, Checked = true};
                 lstAttachProcesses.Items.Add(p);
                 SaveProcessHash(p);
             }
