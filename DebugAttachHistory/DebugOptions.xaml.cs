@@ -52,7 +52,7 @@ namespace Karpach.DebugAttachManager
         private void RbnDevChecked(object sender, RoutedEventArgs e)
         {
             btnIIS.IsChecked = false;            
-            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev")).Select(p=>new ProcessExt(p)).ToList();
+            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Compare(p.ProcessName,"iisexpress",true) == 0).Select(p=>new ProcessExt(p)).ToList();
             lstSearchProcesses.ItemsSource = _processes;
         }
 

@@ -52,9 +52,49 @@ namespace Karpach.DebugAttachManager
                     foreach (ManagementObject oReturn in objectCollection)
                     {
                         var startIndex = oReturn["CommandLine"].ToString().IndexOf("-ap ") + 5; //remove the -ap as well as the space and the "
+                        if (startIndex == -1)
+                        {
+                            return string.Empty;
+                        }
                         var endIndex = oReturn["CommandLine"].ToString().IndexOf("-", startIndex) - 2; //remove the closing "                        
                         return oReturn["CommandLine"].ToString().Substring(startIndex, endIndex - startIndex);                    
                     }                
+                }
+            }
+            if (string.Compare(_process.ProcessName, "iisexpress", true) == 0)
+            {
+                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");
+                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(sq))
+                {
+                    ManagementObjectCollection objectCollection = searcher.Get();
+                    foreach (ManagementObject oReturn in objectCollection)
+                    {
+                        var startIndex = oReturn["CommandLine"].ToString().IndexOf("/site:") + 7; //remove the /site: as well as the "
+                        if (startIndex == -1)
+                        {
+                            return string.Empty;
+                        }
+                        var endIndex = oReturn["CommandLine"].ToString().IndexOf("\"", startIndex+7); //remove the closing "                                                
+                        return oReturn["CommandLine"].ToString().Substring(startIndex, endIndex - startIndex);
+                    }
+                }
+            }
+            if (_process.ProcessName.Contains("WebDev"))
+            {
+                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");
+                using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(sq))
+                {
+                    ManagementObjectCollection objectCollection = searcher.Get();
+                    foreach (ManagementObject oReturn in objectCollection)
+                    {
+                        var startIndex = oReturn["CommandLine"].ToString().IndexOf("/port:") + 6; //remove the /site: as well as the "
+                        if (startIndex == -1)
+                        {
+                            return string.Empty;
+                        }
+                        var endIndex = oReturn["CommandLine"].ToString().IndexOf(" ", startIndex); //remove the closing "                                                
+                        return oReturn["CommandLine"].ToString().Substring(startIndex, endIndex - startIndex);
+                    }
                 }
             }
             return _process.MainWindowTitle;
