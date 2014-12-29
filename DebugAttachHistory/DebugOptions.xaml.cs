@@ -91,8 +91,15 @@ namespace Karpach.DebugAttachManager
 
         private void RbnAllChecked(object sender, RoutedEventArgs e)
         {
-            _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
-            lstSearchProcesses.ItemsSource = _processes;
+            if (string.IsNullOrEmpty(txtFilter.Text))
+            {
+                _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
+                lstSearchProcesses.ItemsSource = _processes;
+            }
+            else
+            {
+              TxtFilterTextChanged(sender, null);   
+            }
         }
 
         private void TxtFilterTextChanged(object sender, TextChangedEventArgs e)

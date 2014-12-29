@@ -3,8 +3,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using System.Text;
+using System.Windows;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Process = System.Diagnostics.Process;
 
 namespace Karpach.DebugAttachManager
 {
@@ -86,6 +90,66 @@ namespace Karpach.DebugAttachManager
             }
         }
 
+        private void SmartRun(object sender, EventArgs e)
+        {            
+            foreach (Project project in DTE.Solution.Projects)
+            {
+                bool? useIISExpress = null;
+                string developmentServerCommandLine = string.Empty;
+                if (project.Properties == null)
+                {
+                    continue;
+                }
+                foreach (Property prop in project.Properties)
+                {
+                    try
+                    {
+                        if (string.Equals(prop.Name, "WebApplication.UseIISExpress"))
+                        {                            
+                            if (!useIISExpress.HasValue || !useIISExpress.Value)
+                            {
+                                useIISExpress = (bool)prop.Value;       
+                            }
+                        } else if (string.Equals(prop.Name, "WebApplication.UseIIS"))
+                        {
+                            if (!useIISExpress.HasValue || !useIISExpress.Value)
+                            {
+                                useIISExpress = !(bool)prop.Value;
+                            }
+                        } else if (string.Equals(prop.Name, "WebApplication.DevelopmentServerCommandLine"))
+                        {
+                            developmentServerCommandLine = (string) prop.Value;                            
+                        }                        
+                    }
+                    catch (Exception)
+                    {                        
+                    }
+                }
+                if (useIISExpress.GetValueOrDefault(false) && !string.IsNullOrEmpty(developmentServerCommandLine))
+                {
+                    var p = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = @"C:\Program Files (x86)\IIS Express\iisexpress.exe",
+                            Arguments = developmentServerCommandLine,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
+                    try
+                    {
+                        p.Start();
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Unable to start IISExpress", "Error", MessageBoxButton.OK,
+                            MessageBoxImage.Error);
+                    }
+                }
+            }                
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
@@ -110,6 +174,9 @@ namespace Karpach.DebugAttachManager
                 mcs.AddCommand(menuToolWin);
                 toolwndCommandID = new CommandID(GuidList.guidDebugAttachManagerCmdSet, (int)PkgCmdIDList.cmdidAttachSmartDebug);
                 menuToolWin = new MenuCommand(AttachSmartDebugCommand, toolwndCommandID);
+                mcs.AddCommand(menuToolWin);
+                toolwndCommandID = new CommandID(GuidList.guidDebugAttachManagerCmdSet, (int)PkgCmdIDList.cmdidSmartRun);
+                menuToolWin = new MenuCommand(SmartRun, toolwndCommandID);
                 mcs.AddCommand(menuToolWin);
             }
             DTE = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
