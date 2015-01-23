@@ -86,7 +86,7 @@ namespace Karpach.DebugAttachManager
                     {
                         windowFrame.Show();
                     }
-                }
+                }                
             }
         }
 
@@ -127,25 +127,16 @@ namespace Karpach.DebugAttachManager
                 }
                 if (useIISExpress.GetValueOrDefault(false) && !string.IsNullOrEmpty(developmentServerCommandLine))
                 {
-                    var p = new Process
-                    {
-                        StartInfo = new ProcessStartInfo
-                        {
-                            FileName = @"C:\Program Files (x86)\IIS Express\iisexpress.exe",
-                            Arguments = developmentServerCommandLine,
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        }
-                    };
-                    try
-                    {
-                        p.Start();
-                    }
-                    catch (Exception)
+                    var iisRunner = new IISExpressRunner(developmentServerCommandLine);
+                    if (!iisRunner.Run())
                     {
                         MessageBox.Show("Unable to start IISExpress", "Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
+                }
+                else
+                {
+                    DTE.ExecuteCommand("Debug.StartWithoutDebugging");
                 }
             }                
         }

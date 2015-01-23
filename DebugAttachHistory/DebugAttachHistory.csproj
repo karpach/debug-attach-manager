@@ -25,7 +25,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Karpach.DebugAttachManager</RootNamespace>
     <AssemblyName>DebugAttachHistory</AssemblyName>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -138,6 +138,7 @@
     </Compile>
     <Compile Include="DebugOptionsWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="IISExpressRunner.cs" />
     <Compile Include="ImageButton.xaml.cs">
       <DependentUpon>ImageButton.xaml</DependentUpon>
     </Compile>
