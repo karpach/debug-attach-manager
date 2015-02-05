@@ -91,9 +91,11 @@ namespace Karpach.DebugAttachManager
         }
 
         private void SmartRun(object sender, EventArgs e)
-        {            
-            foreach (Project project in DTE.Solution.Projects)
+        {
+            bool success = false;
+            for (int i = 1; i <= DTE.Solution.Projects.Count; i++)
             {
+                Project project = DTE.Solution.Projects.Item(i);
                 bool? useIISExpress = null;
                 string developmentServerCommandLine = string.Empty;
                 if (project.Properties == null)
@@ -133,12 +135,16 @@ namespace Karpach.DebugAttachManager
                         MessageBox.Show("Unable to start IISExpress", "Error", MessageBoxButton.OK,
                             MessageBoxImage.Error);
                     }
-                }
-                else
-                {
-                    DTE.ExecuteCommand("Debug.StartWithoutDebugging");
-                }
-            }                
+                    else
+                    {
+                        success = true;
+                    }
+                }                
+            }
+            if (!success)
+            {
+                DTE.ExecuteCommand("Debug.StartWithoutDebugging");
+            }    
         }
 
 
