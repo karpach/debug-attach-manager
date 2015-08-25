@@ -1,51 +1,39 @@
+using System;
 using System.Diagnostics;
 using System.Management;
 
 namespace Karpach.DebugAttachManager
 {
     public class ProcessExt
-    {
-        private readonly Process _process;
-        private string _title;
-        private readonly string _processName;
-
+    {            
         public ProcessExt(Process process)
         {
-            _processName = process.ProcessName;
-            _process = process;
+            ProcessName = process.ProcessName;            
+            Title = GetAppPoolName(process);
         }
 
 
         public ProcessExt(string processName, string title)
         {
-            _title = title;
-            _processName = processName;
+            Title = title;
+            ProcessName = processName;
         }
 
-        public string ProcessName
-        {
-            get { return _processName; }
-        }
+        public string ProcessName { get; }
 
-        public string Title
-        {
-            get { return _title ?? (_title = GetAppPoolName()); }
-        }
+        public string Title { get; }
 
-        public int Hash
-        {
-            get { return string.Concat(ProcessName, Title).GetHashCode(); }
-        }
+        public int Hash => string.Concat(ProcessName, Title).GetHashCode();
 
-        private string GetAppPoolName()
+        private string GetAppPoolName(Process process)
         {
-            if (_process == null)
+            if (process == null)
             {
                 return string.Empty;
             }
-            if (string.Compare(_process.ProcessName, "w3wp", true) == 0)
+            if (string.Equals(process.ProcessName, "w3wp", StringComparison.OrdinalIgnoreCase))
             {                            
-                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");
+                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + process.Id + "'");
                 using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(sq))
                 {
                     ManagementObjectCollection objectCollection = searcher.Get();
@@ -61,9 +49,9 @@ namespace Karpach.DebugAttachManager
                     }                
                 }
             }
-            if (string.Compare(_process.ProcessName, "iisexpress", true) == 0)
+            if (string.Equals(process.ProcessName, "iisexpress", StringComparison.OrdinalIgnoreCase))
             {
-                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");
+                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + process.Id + "'");
                 using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(sq))
                 {
                     ManagementObjectCollection objectCollection = searcher.Get();
@@ -79,9 +67,9 @@ namespace Karpach.DebugAttachManager
                     }
                 }
             }
-            if (_process.ProcessName.Contains("WebDev"))
+            if (process.ProcessName.Contains("WebDev"))
             {
-                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + _process.Id + "'");
+                ObjectQuery sq = new ObjectQuery("Select CommandLine from Win32_Process Where ProcessID = '" + process.Id + "'");
                 using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(sq))
                 {
                     ManagementObjectCollection objectCollection = searcher.Get();
@@ -97,7 +85,7 @@ namespace Karpach.DebugAttachManager
                     }
                 }
             }
-            return _process.MainWindowTitle;
+            return process.MainWindowTitle;
         }
 
     }
