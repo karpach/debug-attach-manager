@@ -200,6 +200,7 @@
     <Resource Include="Resources\local.png" />
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\Images_24bit.bmp" />
+    <Resource Include="Resources\play.png" />
     <Content Include="ru-RU\Extension.vsixlangpack">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

@@ -118,27 +118,35 @@ namespace Karpach.DebugAttachManager
         private bool Attach(object sender, RoutedEventArgs e)
         {
             EnvDTE.Processes processes = DebugAttachManagerPackage.DTE.Debugger.LocalProcesses;
-            var selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
-            if (selectedProc.Count == 0)
+            var selectedProcess = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+            if (selectedProcess.Count == 0)
             {
                 if (!IsLoaded)
                 {
                     MyToolWindowLoaded(sender, e);
-                    selectedProc = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+                    selectedProcess = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
                 }
-                if (selectedProc.Count == 0)
+                if (selectedProcess.Count == 0)
                 {
                     MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }
             bool found = false;
-            foreach (EnvDTE.Process proc in processes)
+            foreach (EnvDTE.Process process in processes)
             {
-                ProcessExt pp = new ProcessExt(Process.GetProcessById(proc.ProcessID));
-                if (selectedProc.Exists(p => pp.Hash == p.Process.Hash))
+                ProcessExt pp;
+                try
                 {
-                    proc.Attach();
+                    pp = new ProcessExt(Process.GetProcessById(process.ProcessID));
+                }
+                catch (ArgumentException)
+                {                    
+                    continue;
+                }                
+                if (selectedProcess.Exists(p => pp.Hash == p.Process.Hash))
+                {
+                    process.Attach();
                     found = true;
                 }
             }
