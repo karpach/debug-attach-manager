@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.11.0"             
+             xmlns:shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
              mc:Ignorable="d" 
              x:Name="root"
              d:DesignHeight="26" d:DesignWidth="100">    
@@ -17,7 +17,7 @@
                     </StackPanel>                    
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsPressed" Value="true">
-                            <Setter TargetName="Container" Property="Background" Value="{DynamicResource {x:Static Shell:VsBrushes.CommandBarMouseDownBackgroundBeginKey}}" />                            
+                            <Setter TargetName="Container" Property="Background" Value="{DynamicResource {x:Static shell:VsBrushes.CommandBarMouseDownBackgroundBeginKey}}" />                            
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.11.0"             
+             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
              xmlns:ux="clr-namespace:Karpach.DebugAttachManager" mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Name="MyToolWindow"
@@ -12,24 +12,24 @@
         <DataTemplate x:Key="ProcessTemplateWithCheckbox">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
+                    <ColumnDefinition />                    
                     <ColumnDefinition Width="15" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
                     <CheckBox Content="{Binding Process.ProcessName}" IsChecked="{Binding Checked}" Checked="CheckBoxChecked" Margin="0 0 10 0" Unchecked="CheckBoxUnchecked"></CheckBox>
                     <TextBlock Text="{Binding Process.Title,StringFormat=({0})}">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                          <Style.Triggers>
-                            <Trigger Property="Text" Value="()">
-                              <Setter Property="TextBlock.Visibility" Value="Collapsed"/>
-                            </Trigger>
-                          </Style.Triggers>
-                        </Style>
-                     </TextBlock.Style>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="()">
+                                        <Setter Property="TextBlock.Visibility" Value="Collapsed"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
                     </TextBlock>
                 </StackPanel>
-                <Button Width="15" Height="15"  Content="x" Cursor="Hand" Grid.Column="1" Click="ButtonClick">
+                <Button Width="15" Height="15"  Content="x" Cursor="Hand" Grid.Column="2" Click="ButtonClick">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <TextBlock FontWeight="SemiBold">
