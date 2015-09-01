@@ -1,6 +1,8 @@
 using System;
-using System.Diagnostics;
 using System.Management;
+using EnvDTE;
+using EnvDTE80;
+using Process = System.Diagnostics.Process;
 
 namespace Karpach.DebugAttachManager
 {
@@ -10,6 +12,7 @@ namespace Karpach.DebugAttachManager
         {
             ProcessName = process.ProcessName;            
             Title = GetAppPoolName(process);
+            DefaultDebugMode = GetDebugMode(process);
         }
 
 
@@ -17,13 +20,33 @@ namespace Karpach.DebugAttachManager
         {
             Title = title;
             ProcessName = processName;
+            DefaultDebugMode = string.Empty;
         }
 
         public string ProcessName { get; }
 
         public string Title { get; }
 
+        public string DefaultDebugMode { get; }   
+
         public int Hash => string.Concat(ProcessName, Title).GetHashCode();
+
+        private string GetDebugMode(Process process)
+        {
+            Processes localProcesses = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).LocalProcesses;
+            foreach (Process2 p in localProcesses)
+            {
+                if (p.ProcessID == process.Id)
+                {
+                    if (p.Transport.Engines.Count > 0)
+                    {                        
+                        return p.Transport.Engines.Item("Default").Name;
+                    }                    
+                    break;
+                }
+            }            
+            return string.Empty;
+        }
 
         private string GetAppPoolName(Process process)
         {

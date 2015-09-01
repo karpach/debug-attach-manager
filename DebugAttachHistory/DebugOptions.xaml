@@ -6,13 +6,14 @@
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
              xmlns:ux="clr-namespace:Karpach.DebugAttachManager" mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
-             Name="MyToolWindow"
-             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" Loaded="MyToolWindowLoaded">
+             Name="DebugOptionsToolWindow"
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" Loaded="DebugOptionsToolWindowLoaded">
     <Control.Resources>        
         <DataTemplate x:Key="ProcessTemplateWithCheckbox">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />                    
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="110" />
                     <ColumnDefinition Width="15" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Column="0">
@@ -29,6 +30,11 @@
                         </TextBlock.Style>
                     </TextBlock>
                 </StackPanel>
+                <ComboBox Width="100" Height="15" Grid.Column="1" 
+                          ItemsSource="{Binding ElementName=DebugOptionsToolWindow, Path=DebugModes}"
+                          Style="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}" 
+                          SelectedValue="{Binding DebugMode}"
+                          SelectionChanged="DebugModeChanged"/>                    
                 <Button Width="15" Height="15"  Content="x" Cursor="Hand" Grid.Column="2" Click="ButtonClick">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">

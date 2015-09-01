@@ -25,8 +25,10 @@ namespace Karpach.DebugAttachManager.Properties
                             {
                                 ProcessName = _settingsStore.GetString("DebugAttachManagerProcesses\\" + s, "ProcessName"),
                                 Title = _settingsStore.GetString("DebugAttachManagerProcesses\\" + s, "Title"),
-                                Selected = _settingsStore.GetBoolean("DebugAttachManagerProcesses\\" + s, "Selected")
-                            };
+                                Selected = _settingsStore.GetBoolean("DebugAttachManagerProcesses\\" + s, "Selected"),
+                                DebugMode = _settingsStore.PropertyExists("DebugAttachManagerProcesses\\" + s, "DebugMode") ?
+                                _settingsStore.GetString("DebugAttachManagerProcesses\\" + s, "DebugMode") : null
+                };
                 Processes.Add(p.Hash,p);
             }
         }
@@ -44,10 +46,7 @@ namespace Karpach.DebugAttachManager.Properties
         } 
        
         private static Settings _default;
-        public static Settings Default
-        {
-            get { return _default ?? (_default = new Settings(DebugAttachManagerPackage.ServiceProvider)); }
-        }
+        public static Settings Default => _default ?? (_default = new Settings(DebugAttachManagerPackage.ServiceProvider));
 
         public void Save()
         {
@@ -62,6 +61,7 @@ namespace Karpach.DebugAttachManager.Properties
                 _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "Title", p.Title);
                 _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "ProcessName", p.ProcessName);
                 _settingsStore.SetBoolean("DebugAttachManagerProcesses\\Process " + i, "Selected", p.Selected);
+                _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "DebugMode", p.DebugMode);
                 i++;
             }
         }

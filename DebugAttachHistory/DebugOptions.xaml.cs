@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
+using EnvDTE80;
 using Karpach.DebugAttachManager.Properties;
 
 namespace Karpach.DebugAttachManager
@@ -13,13 +14,20 @@ namespace Karpach.DebugAttachManager
     /// Interaction logic for DebugOptionsControl.xaml
     /// </summary>
     public partial class DebugOptionsControl
-    {               
+    {
+        #region Properties
+        
+        public string[] DebugModes => _debugModes.Value;        
+
+        #endregion      
+
         #region Constructors
 
         public DebugOptionsControl()
         {
             InitializeComponent();            
-            _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();            
+            _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
+            _debugModes = new Lazy<string[]>(() => GetDebugModes().ToArray());            
             lstSearchProcesses.ItemsSource = _processes;                        
         }
 
@@ -40,12 +48,21 @@ namespace Karpach.DebugAttachManager
         {
             if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(p => p.Process != lstSearchProcesses.SelectedItem))
             {
-                var selectedProc = (ProcessExt)lstSearchProcesses.SelectedItem;
-                var p = new ProcessToBeAttached {Process = selectedProc, Checked = true};
+                var selectedProcess = (ProcessExt)lstSearchProcesses.SelectedItem;
+                var p = new ProcessToBeAttached {Process = selectedProcess, Checked = true, DebugMode = selectedProcess.DefaultDebugMode };
                 lstAttachProcesses.Items.Add(p);
                 SaveProcessHash(p);
             }
-        }        
+        }
+
+        private IEnumerable<string> GetDebugModes()
+        {
+            Transport transport = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).Transports.Item("Default");
+            foreach (Engine engine in transport.Engines)
+            {
+                yield return engine.Name;
+            }            
+        }
 
         private void RbnDevChecked(object sender, RoutedEventArgs e)
         {
@@ -115,23 +132,23 @@ namespace Karpach.DebugAttachManager
 
         private bool Attach(object sender, RoutedEventArgs e)
         {
-            EnvDTE.Processes processes = DebugAttachManagerPackage.DTE.Debugger.LocalProcesses;
-            var selectedProcess = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
-            if (selectedProcess.Count == 0)
+            EnvDTE.Processes processes = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).LocalProcesses;
+            var selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+            if (selectedProcesses.Count == 0)
             {
                 if (!IsLoaded)
                 {
-                    MyToolWindowLoaded(sender, e);
-                    selectedProcess = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+                    DebugOptionsToolWindowLoaded(sender, e);
+                    selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
                 }
-                if (selectedProcess.Count == 0)
+                if (selectedProcesses.Count == 0)
                 {
                     MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }
             bool found = false;
-            foreach (EnvDTE.Process process in processes)
+            foreach (Process2 process in processes)
             {
                 ProcessExt pp;
                 try
@@ -141,8 +158,14 @@ namespace Karpach.DebugAttachManager
                 catch (ArgumentException)
                 {                    
                     continue;
-                }                
-                if (selectedProcess.Exists(p => pp.Hash == p.Process.Hash))
+                }
+                var selectedProcess = selectedProcesses.FirstOrDefault(p => pp.Hash == p.Process.Hash);
+                if (!string.IsNullOrEmpty(selectedProcess?.DebugMode))
+                {
+                    process.Attach2(new [] { (DebugAttachManagerPackage.DTE.Debugger as Debugger2).Transports.Item("Default").Engines.Item(selectedProcess.DebugMode)});
+                    found = true;
+                }
+                else if (selectedProcess != null)
                 {
                     process.Attach();
                     found = true;
@@ -156,7 +179,7 @@ namespace Karpach.DebugAttachManager
             return true;
         }
 
-        private void MyToolWindowLoaded(object sender, RoutedEventArgs e)
+        private void DebugOptionsToolWindowLoaded(object sender, RoutedEventArgs e)
         {            
             if (lstAttachProcesses.Items.Count==0)
             {
@@ -168,14 +191,15 @@ namespace Karpach.DebugAttachManager
                     {
                         foreach (var p in processes)
                         {
-                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash) });
+                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash), DebugMode = Settings.Default.Processes[pHash].DebugMode ?? p.DefaultDebugMode });
                         }   
                     }
                     else
                     {
                         lstAttachProcesses.Items.Add(new ProcessToBeAttached {
                             Process = new ProcessExt(Settings.Default.Processes[pHash].ProcessName, Settings.Default.Processes[pHash].Title), 
-                            Checked = IsChecked(hash) 
+                            Checked = IsChecked(hash),
+                            DebugMode = Settings.Default.Processes[pHash].DebugMode
                         });
                     }
                 }   
@@ -203,6 +227,12 @@ namespace Karpach.DebugAttachManager
             SaveProcessHash(p);
         }
 
+        private void DebugModeChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var p = (ProcessToBeAttached)((ComboBox)sender).DataContext;            
+            SaveProcessHash(p);
+        }
+
         #endregion
 
         #region Helper methods
@@ -216,7 +246,8 @@ namespace Karpach.DebugAttachManager
         {
             if (Settings.Default.Processes.ContainsKey(process.Process.Hash))
             {
-                Settings.Default.Processes[process.Process.Hash].Selected = process.Checked;   
+                Settings.Default.Processes[process.Process.Hash].Selected = process.Checked;
+                Settings.Default.Processes[process.Process.Hash].DebugMode = process.DebugMode;
             }
             else
             {
@@ -224,7 +255,8 @@ namespace Karpach.DebugAttachManager
                                                                          {
                                                                              Title = process.Process.Title,
                                                                              ProcessName = process.Process.ProcessName,
-                                                                             Selected = process.Checked
+                                                                             Selected = process.Checked,
+                                                                             DebugMode = process.DebugMode
                                                                          });
             }
             Settings.Default.Save();
@@ -243,7 +275,8 @@ namespace Karpach.DebugAttachManager
 
         #region Private Variables
 
-        private List<ProcessExt> _processes;        
+        private List<ProcessExt> _processes;
+        private readonly Lazy<string[]> _debugModes;        
 
         #endregion        
     }
