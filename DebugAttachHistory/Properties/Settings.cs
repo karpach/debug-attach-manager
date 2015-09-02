@@ -61,7 +61,10 @@ namespace Karpach.DebugAttachManager.Properties
                 _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "Title", p.Title);
                 _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "ProcessName", p.ProcessName);
                 _settingsStore.SetBoolean("DebugAttachManagerProcesses\\Process " + i, "Selected", p.Selected);
-                _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "DebugMode", p.DebugMode);
+                if (p.DebugMode != null)
+                {
+                    _settingsStore.SetString("DebugAttachManagerProcesses\\Process " + i, "DebugMode", p.DebugMode);
+                }                
                 i++;
             }
         }

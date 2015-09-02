@@ -11,42 +11,22 @@ namespace Karpach.DebugAttachManager
         public ProcessExt(Process process)
         {
             ProcessName = process.ProcessName;            
-            Title = GetAppPoolName(process);
-            DefaultDebugMode = GetDebugMode(process);
+            Title = GetAppPoolName(process);            
         }
 
 
         public ProcessExt(string processName, string title)
         {
             Title = title;
-            ProcessName = processName;
-            DefaultDebugMode = string.Empty;
+            ProcessName = processName;            
         }
 
         public string ProcessName { get; }
 
         public string Title { get; }
+        
 
-        public string DefaultDebugMode { get; }   
-
-        public int Hash => string.Concat(ProcessName, Title).GetHashCode();
-
-        private string GetDebugMode(Process process)
-        {
-            Processes localProcesses = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).LocalProcesses;
-            foreach (Process2 p in localProcesses)
-            {
-                if (p.ProcessID == process.Id)
-                {
-                    if (p.Transport.Engines.Count > 0)
-                    {                        
-                        return p.Transport.Engines.Item("Default").Name;
-                    }                    
-                    break;
-                }
-            }            
-            return string.Empty;
-        }
+        public int Hash => string.Concat(ProcessName, Title).GetHashCode();       
 
         private string GetAppPoolName(Process process)
         {

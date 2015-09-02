@@ -33,7 +33,9 @@
                 <ComboBox Width="100" Height="15" Grid.Column="1" 
                           ItemsSource="{Binding ElementName=DebugOptionsToolWindow, Path=DebugModes}"
                           Style="{StaticResource {x:Static ToolBar.ComboBoxStyleKey}}" 
-                          SelectedValue="{Binding DebugMode}"
+                          DisplayMemberPath="Key"
+                          SelectedValuePath="Value"
+                          SelectedValue="{Binding DebugMode}"                          
                           SelectionChanged="DebugModeChanged"/>                    
                 <Button Width="15" Height="15"  Content="x" Cursor="Hand" Grid.Column="2" Click="ButtonClick">
                     <Button.Template>

@@ -17,7 +17,7 @@ namespace Karpach.DebugAttachManager
     {
         #region Properties
         
-        public string[] DebugModes => _debugModes.Value;        
+        public KeyValuePair<string,string>[] DebugModes => _debugModes.Value;        
 
         #endregion      
 
@@ -27,7 +27,7 @@ namespace Karpach.DebugAttachManager
         {
             InitializeComponent();            
             _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
-            _debugModes = new Lazy<string[]>(() => GetDebugModes().ToArray());            
+            _debugModes = new Lazy<KeyValuePair<string, string>[]>(() => GetDebugModes().ToArray());            
             lstSearchProcesses.ItemsSource = _processes;                        
         }
 
@@ -46,28 +46,30 @@ namespace Karpach.DebugAttachManager
 
         private void LstSearchProcessesMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(p => p.Process != lstSearchProcesses.SelectedItem))
+            if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().All(
+                p => p.Process.Hash != ((ProcessExt)lstSearchProcesses.SelectedItem).Hash || p.DebugMode != null))
             {
                 var selectedProcess = (ProcessExt)lstSearchProcesses.SelectedItem;
-                var p = new ProcessToBeAttached {Process = selectedProcess, Checked = true, DebugMode = selectedProcess.DefaultDebugMode };
+                var p = new ProcessToBeAttached {Process = selectedProcess, Checked = true };
                 lstAttachProcesses.Items.Add(p);
                 SaveProcessHash(p);
             }
         }
 
-        private IEnumerable<string> GetDebugModes()
+        private IEnumerable<KeyValuePair<string,string>> GetDebugModes()
         {
-            Transport transport = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).Transports.Item("Default");
+            Transport transport = ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).Transports.Item("Default");
+            yield return new KeyValuePair<string, string>("Auto", null);
             foreach (Engine engine in transport.Engines)
             {
-                yield return engine.Name;
+                yield return new KeyValuePair<string,string>(engine.Name, $"{engine.ID}");
             }            
         }
 
         private void RbnDevChecked(object sender, RoutedEventArgs e)
         {
-            btnIIS.IsChecked = false;            
-            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Compare(p.ProcessName,"iisexpress",true) == 0).Select(p=>new ProcessExt(p)).ToList();
+            btnIIS.IsChecked = false;
+            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName,"iisexpress")).Select(p=>new ProcessExt(p)).ToList();
             lstSearchProcesses.ItemsSource = _processes;
         }
 
@@ -105,7 +107,7 @@ namespace Karpach.DebugAttachManager
         }        
 
         private void RbnAllChecked(object sender, RoutedEventArgs e)
-        {
+        {            
             if (string.IsNullOrEmpty(txtFilter.Text))
             {
                 _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
@@ -132,7 +134,7 @@ namespace Karpach.DebugAttachManager
 
         private bool Attach(object sender, RoutedEventArgs e)
         {
-            EnvDTE.Processes processes = (DebugAttachManagerPackage.DTE.Debugger as Debugger2).LocalProcesses;
+            EnvDTE.Processes processes = ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).LocalProcesses;
             var selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
             if (selectedProcesses.Count == 0)
             {
@@ -162,7 +164,13 @@ namespace Karpach.DebugAttachManager
                 var selectedProcess = selectedProcesses.FirstOrDefault(p => pp.Hash == p.Process.Hash);
                 if (!string.IsNullOrEmpty(selectedProcess?.DebugMode))
                 {
-                    process.Attach2(new [] { (DebugAttachManagerPackage.DTE.Debugger as Debugger2).Transports.Item("Default").Engines.Item(selectedProcess.DebugMode)});
+                    foreach (Engine engine in ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).Transports.Item("Default").Engines)
+                    {
+                        if (string.Equals(engine.ID, selectedProcess.DebugMode))
+                        {
+                            process.Attach2(new[] { engine });
+                        }
+                    }                    
                     found = true;
                 }
                 else if (selectedProcess != null)
@@ -191,7 +199,7 @@ namespace Karpach.DebugAttachManager
                     {
                         foreach (var p in processes)
                         {
-                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash), DebugMode = Settings.Default.Processes[pHash].DebugMode ?? p.DefaultDebugMode });
+                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash), DebugMode = Settings.Default.Processes[pHash].DebugMode });
                         }   
                     }
                     else
@@ -276,7 +284,7 @@ namespace Karpach.DebugAttachManager
         #region Private Variables
 
         private List<ProcessExt> _processes;
-        private readonly Lazy<string[]> _debugModes;        
+        private readonly Lazy<KeyValuePair<string,string>[]> _debugModes;        
 
         #endregion        
     }
