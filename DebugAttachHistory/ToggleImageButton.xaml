@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
+             xmlns:ux="clr-namespace:Karpach.DebugAttachManager"
+             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
              mc:Ignorable="d" 
              x:Name="root"
              d:DesignHeight="26" d:DesignWidth="100">    
@@ -14,7 +15,8 @@
                     <Border x:Name="Border" BorderThickness="1" Margin="2,3,2,3">
                         <StackPanel x:Name="Container"  Orientation="Horizontal">
                             <Image Source="{Binding Path=Image, ElementName=root}" Width="16" Margin="3,0,0,0"/>
-                            <TextBlock Text="{Binding Path=Text, ElementName=root}" Height="Auto" VerticalAlignment="Center" Padding="6,0,3,2" />
+                            <TextBlock Text="{Binding Path=Text, ElementName=root}" Height="Auto" VerticalAlignment="Center" Padding="6,0,3,2" 
+                                       Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"/>
                         </StackPanel>
                     </Border>
                     <ControlTemplate.Triggers>
