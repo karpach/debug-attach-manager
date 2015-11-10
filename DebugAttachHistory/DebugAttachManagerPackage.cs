@@ -94,38 +94,14 @@ namespace Karpach.DebugAttachManager
             for (int i = 1; i <= DTE.Solution.Projects.Count; i++)
             {
                 Project project = DTE.Solution.Projects.Item(i);
-                bool? useIISExpress = null;
-                string developmentServerCommandLine = string.Empty;
+                                                
                 if (project.Properties == null)
                 {
                     continue;
                 }
-                foreach (Property prop in project.Properties)
-                {
-                    try
-                    {
-                        if (string.Equals(prop.Name, "WebApplication.UseIISExpress"))
-                        {                            
-                            if (!useIISExpress.HasValue || !useIISExpress.Value)
-                            {
-                                useIISExpress = (bool)prop.Value;       
-                            }
-                        } else if (string.Equals(prop.Name, "WebApplication.UseIIS"))
-                        {
-                            if (!useIISExpress.HasValue || !useIISExpress.Value)
-                            {
-                                useIISExpress = !(bool)prop.Value;
-                            }
-                        } else if (string.Equals(prop.Name, "WebApplication.DevelopmentServerCommandLine"))
-                        {
-                            developmentServerCommandLine = (string) prop.Value;                            
-                        }                        
-                    }
-                    catch (Exception)
-                    {                        
-                    }
-                }
-                if (useIISExpress.GetValueOrDefault(false) && !string.IsNullOrEmpty(developmentServerCommandLine))
+
+                string developmentServerCommandLine = GetDevelopmentCommandLine(project);
+                if (!string.IsNullOrEmpty(developmentServerCommandLine))
                 {
                     var iisRunner = new IISExpressRunner(developmentServerCommandLine);
                     if (!iisRunner.Run())
@@ -143,6 +119,56 @@ namespace Karpach.DebugAttachManager
             {
                 DTE.ExecuteCommand("Debug.StartWithoutDebugging");
             }    
+        }
+
+        private static string GetDevelopmentCommandLine(Project project)
+        {
+            bool? useIISExpress = null;
+            string developmentServerCommandLine = string.Empty;
+            foreach (Property prop in project.Properties)
+            {
+                try
+                {
+                    if (string.Equals(prop.Name, "Extender"))
+                    {
+                        for (int j = 1; j <= project.ProjectItems.Count; j++)
+                        {
+                            ProjectItem proj = project.ProjectItems.Item(j);
+                            if (proj.SubProject != null)
+                            {
+                                string developmentCommandLine = GetDevelopmentCommandLine(proj.SubProject);
+                                if (!string.IsNullOrEmpty(developmentCommandLine))
+                                {
+                                    return developmentCommandLine;
+                                }
+                            }
+                        }
+                    }
+
+                    if (string.Equals(prop.Name, "WebApplication.UseIISExpress"))
+                    {
+                        if (!useIISExpress.HasValue || !useIISExpress.Value)
+                        {
+                            useIISExpress = (bool) prop.Value;
+                        }
+                    }
+                    else if (string.Equals(prop.Name, "WebApplication.UseIIS"))
+                    {
+                        if (!useIISExpress.HasValue || !useIISExpress.Value)
+                        {
+                            useIISExpress = !(bool) prop.Value;
+                        }
+                    }
+                    else if (string.Equals(prop.Name, "WebApplication.DevelopmentServerCommandLine"))
+                    {
+                        developmentServerCommandLine = (string) prop.Value;
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+            return useIISExpress.GetValueOrDefault(false) ? developmentServerCommandLine: String.Empty;
         }
 
 
