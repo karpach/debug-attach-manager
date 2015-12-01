@@ -218,6 +218,10 @@
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\Images_24bit.bmp" />
     <Resource Include="Resources\play.png" />
+    <Content Include="notes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\Preview.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

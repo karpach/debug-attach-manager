@@ -1,0 +1,2 @@
+﻿1.9.11201.0
+	Fixed Smart Run functionality for the scenario when projects are grouped in solution folders.

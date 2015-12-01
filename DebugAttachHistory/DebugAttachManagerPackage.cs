@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using System.Linq;
 using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -100,18 +102,21 @@ namespace Karpach.DebugAttachManager
                     continue;
                 }
 
-                string developmentServerCommandLine = GetDevelopmentCommandLine(project);
-                if (!string.IsNullOrEmpty(developmentServerCommandLine))
+                List<string> developmentServerCommandLines = GetDevelopmentCommandLine(project);
+                foreach (string developmentServerCommandLine in developmentServerCommandLines)
                 {
-                    var iisRunner = new IISExpressRunner(developmentServerCommandLine);
-                    if (!iisRunner.Run())
+                    if (!string.IsNullOrEmpty(developmentServerCommandLine))
                     {
-                        MessageBox.Show("Unable to start IISExpress", "Error", MessageBoxButton.OK,
-                            MessageBoxImage.Error);
-                    }
-                    else
-                    {
-                        success = true;
+                        var iisRunner = new IISExpressRunner(developmentServerCommandLine);
+                        if (!iisRunner.Run())
+                        {
+                            MessageBox.Show("Unable to start IISExpress", "Error", MessageBoxButton.OK,
+                                MessageBoxImage.Error);
+                        }
+                        else
+                        {
+                            success = true;
+                        }
                     }
                 }                
             }
@@ -121,7 +126,7 @@ namespace Karpach.DebugAttachManager
             }    
         }
 
-        private static string GetDevelopmentCommandLine(Project project)
+        private static List<string> GetDevelopmentCommandLine(Project project)
         {
             bool? useIISExpress = null;
             string developmentServerCommandLine = string.Empty;
@@ -131,18 +136,20 @@ namespace Karpach.DebugAttachManager
                 {
                     if (string.Equals(prop.Name, "Extender"))
                     {
+                        List<string> developmentServerCommandLines = new List<string>();
                         for (int j = 1; j <= project.ProjectItems.Count; j++)
                         {
                             ProjectItem proj = project.ProjectItems.Item(j);
                             if (proj.SubProject != null)
                             {
-                                string developmentCommandLine = GetDevelopmentCommandLine(proj.SubProject);
-                                if (!string.IsNullOrEmpty(developmentCommandLine))
+                                List<string> developmentCommandLines = GetDevelopmentCommandLine(proj.SubProject);
+                                if (developmentCommandLines.Any())
                                 {
-                                    return developmentCommandLine;
+                                    developmentServerCommandLines.AddRange(developmentCommandLines);
                                 }
                             }
                         }
+                        return developmentServerCommandLines;
                     }
 
                     if (string.Equals(prop.Name, "WebApplication.UseIISExpress"))
@@ -168,7 +175,7 @@ namespace Karpach.DebugAttachManager
                 {
                 }
             }
-            return useIISExpress.GetValueOrDefault(false) ? developmentServerCommandLine: String.Empty;
+            return useIISExpress.GetValueOrDefault(false) ? new List<string>(new [] { developmentServerCommandLine }) : new List<string>();
         }
 
 
