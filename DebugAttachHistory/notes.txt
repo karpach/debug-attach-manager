@@ -1,2 +1,4 @@
-﻿1.9.11201.0
+﻿1.10.03191.0
+	Added support for Visual Studio 2017
+1.9.11201.0
 	Fixed Smart Run functionality for the scenario when projects are grouped in solution folders.
