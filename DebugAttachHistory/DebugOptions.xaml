@@ -1,0 +1,152 @@
+﻿<UserControl x:Class="Karpach.DebugAttachManager.DebugOptionsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
+             xmlns:ux="clr-namespace:Karpach.DebugAttachManager"              
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="DebugOptionsToolWindow"
+             Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" Loaded="DebugOptionsToolWindowLoaded">
+    <Control.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ToolbarComboBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate x:Key="ProcessTemplateWithCheckbox">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="110" />
+                        <ColumnDefinition Width="15" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                        <CheckBox Content="{Binding Process.ProcessName}" IsChecked="{Binding Checked}" 
+            				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
+            				Checked="CheckBoxChecked" Margin="0 0 10 0" Unchecked="CheckBoxUnchecked"/>
+                        <TextBlock Text="{Binding Process.Title,StringFormat=({0})}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="()">
+                                            <Setter Property="TextBlock.Visibility" Value="Collapsed"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <ComboBox Width="100" Height="15" Grid.Column="1" 
+                        Style="{DynamicResource ToolbarComboBox}"
+            			ItemsSource="{Binding ElementName=DebugOptionsToolWindow, Path=DebugModes}"                          
+            			DisplayMemberPath="Key"
+            			SelectedValuePath="Value"
+            			SelectedValue="{Binding DebugMode}"                          
+            			SelectionChanged="DebugModeChanged">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ComboBoxItem}">
+                                <Setter Property="Background" Value="{DynamicResource {x:Static ux:Colors.MainBackground}}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource {x:Static ux:Colors.SearchBorder}}"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
+                    <Button Width="15" Height="15"  Content="x" Cursor="Hand" Grid.Column="2" Click="ButtonClick">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <TextBlock FontWeight="SemiBold">
+            							<ContentPresenter />
+            				    </TextBlock>
+                            </ControlTemplate>
+                        </Button.Template>
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Foreground" Value="{DynamicResource {x:Static ux:Colors.LinkForeground}}" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter Property="Foreground" Value="{DynamicResource {x:Static ux:Colors.LinkHoverForeground}}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="ProcessTemplate">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0"></TextBlock>
+                    <TextBlock Text="{Binding Title,StringFormat=({0})}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="()">
+                                        <Setter Property="TextBlock.Visibility" Value="Collapsed"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </DataTemplate>
+            <Style TargetType="{x:Type Separator}" BasedOn="{StaticResource {x:Type Separator}}">
+                <Setter Property="Margin" Value="3,3,3,3"/>
+                <Setter Property="LayoutTransform">
+                    <Setter.Value>
+                        <TransformGroup>
+                            <TransformGroup.Children>
+                                <TransformCollection>
+                                    <RotateTransform Angle="90"/>
+                                </TransformCollection>
+                            </TransformGroup.Children>
+                        </TransformGroup>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Control.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26" />
+            <RowDefinition Height="26"/>
+            <RowDefinition />
+            <RowDefinition Height="35" />
+            <RowDefinition Height="150"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <StackPanel.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="{DynamicResource {x:Static ux:Colors.ToobarBackgroundBegin}}" Offset="0"/>
+                    <GradientStop Color="{DynamicResource {x:Static ux:Colors.ToobarBackgroundEnd}}" Offset="1"/>
+                </LinearGradientBrush>
+            </StackPanel.Background>
+            <ux:ToggleImageButton x:Name="btnDev" Text="Development IIS" Image="/DebugAttachHistory;component/Resources/local.png" Checked="RbnDevChecked" UnChecked="RbnDevUnChecked" />
+            <ux:ToggleImageButton x:Name="btnIIS" Text="IIS" Image="/DebugAttachHistory;component/Resources/iis.png" Checked="RbnIisChecked" UnChecked="RbnIisUnChecked"/>
+            <ux:ImageButton x:Name="btnRefresh" Text="Refresh" Image="/DebugAttachHistory;component/Resources/refresh.png" Click="BtnRefreshClick" />
+            <Separator />
+            <ux:ImageButton x:Name="btnAttach" Text="Attach" Image="/DebugAttachHistory;component/Resources/attach.png" Click="BtnAttachClick" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Name="panTop" Orientation="Vertical">
+            <ux:SearchControl x:Name="txtFilter"  TextChanged="TxtFilterTextChanged" Height="26"
+				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
+				BorderBrush="{DynamicResource {x:Static ux:Colors.SearchBorder}}"
+				Background="{DynamicResource {x:Static ux:Colors.SearchBackground}}"
+				HintColor="{DynamicResource {x:Static ux:Colors.SearchPlaceHolderForeground}}" 
+				HintText="Search Processes"/>
+        </StackPanel>
+        <ListBox Grid.Row="2" Name="lstSearchProcesses" MinHeight="60" ItemTemplate="{StaticResource ProcessTemplate}" 
+			Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
+			Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
+			MouseDoubleClick="LstSearchProcessesMouseDoubleClick" Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+        <TextBlock Grid.Row="3" Text="Processes to be attached:"  Padding="10,15,0,0" FontSize="12" Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}" />
+        <ListBox Grid.Row="4" Name="lstAttachProcesses" Height="150" ItemTemplate="{StaticResource ProcessTemplateWithCheckbox}" 
+			Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
+			Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
+			Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </Grid>
+</UserControl>

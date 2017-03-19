@@ -1,0 +1,72 @@
+﻿<UserControl x:Name="SearchControlControl"
+             x:Class="Karpach.DebugAttachManager.SearchControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"              
+             mc:Ignorable="d" 
+             d:DesignHeight="26" d:DesignWidth="300">
+    <UserControl.Resources>
+        <Style x:Key="NoTextIcon" TargetType="Button" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Setter Property="Visibility" Value="Visible" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Text, ElementName=txtEntry}" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="TextIcon" TargetType="Path" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Text, ElementName=txtEntry}" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="WaterMarkText" TargetType="TextBlock" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Text, ElementName=txtEntry}" Value="{x:Static sys:String.Empty}">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsKeyboardFocused, ElementName=txtEntry}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Border BorderBrush="{Binding ElementName=SearchControlControl, Path=BorderBrush}" BorderThickness="1" 
+            Background="{Binding ElementName=SearchControlControl, Path=Background}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="26"/>
+            </Grid.ColumnDefinitions>
+            <Grid Column="0">
+                <TextBlock Text="{Binding ElementName=SearchControlControl, Path=HintText}" 
+                       Margin="6,0,0,0"
+                       Foreground="{Binding ElementName=SearchControlControl, Path=HintColor}"
+                       VerticalAlignment="Center"
+                       Style="{StaticResource WaterMarkText}" />
+                <TextBox VerticalAlignment="Stretch" VerticalContentAlignment="Center"  Name="txtEntry" TextChanged="SearchTextChanged"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Foreground="{Binding ElementName=SearchControlControl, Path=Foreground}"
+                     Text="{Binding ElementName=SearchControlControl, Path=Text}"
+                     Padding="3,0,0,0"/>
+            </Grid>
+            <Grid Column="1" Margin="6">
+                <Path Name="SearchGlyph" Style="{StaticResource TextIcon}" 
+                      Stretch="Fill" Fill="{Binding ElementName=SearchControlControl, Path=HintColor}"  Data="M960 832L710.875 582.875C746.438 524.812 768 457.156 768 384 768 171.96900000000005 596 0 384 0 171.969 0 0 171.96900000000005 0 384c0 212 171.969 384 384 384 73.156 0 140.812-21.562 198.875-57L832 960c17.5 17.5 46.5 17.375 64 0l64-64C977.5 878.5 977.5 849.5 960 832zM384 640c-141.375 0-256-114.625-256-256s114.625-256 256-256 256 114.625 256 256S525.375 640 384 640z" />
+                <Button Name="btnCancel" Style="{StaticResource NoTextIcon}" Margin="2" Click="CancelClick">
+                    <Button.Template>
+                        <ControlTemplate>
+                            <Path Name="CrossGlyph"
+                            Stretch="Fill" Fill="{Binding ElementName=txtEntry, Path=Foreground}"  Data="M22.245,4.015c0.313,0.313,0.313,0.826,0,1.139l-6.276,6.27c-0.313,0.312-0.313,0.826,0,1.14l6.273,6.272  c0.313,0.313,0.313,0.826,0,1.14l-2.285,2.277c-0.314,0.312-0.828,0.312-1.142,0l-6.271-6.271c-0.313-0.313-0.828-0.313-1.141,0  l-6.276,6.267c-0.313,0.313-0.828,0.313-1.141,0l-2.282-2.28c-0.313-0.313-0.313-0.826,0-1.14l6.278-6.269  c0.313-0.312,0.313-0.826,0-1.14L1.709,5.147c-0.314-0.313-0.314-0.827,0-1.14l2.284-2.278C4.308,1.417,4.821,1.417,5.135,1.73  L11.405,8c0.314,0.314,0.828,0.314,1.141,0.001l6.276-6.267c0.312-0.312,0.826-0.312,1.141,0L22.245,4.015z" />
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

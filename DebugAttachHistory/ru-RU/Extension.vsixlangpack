@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VsixLanguagePack Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema-lp/2010">
+  <LocalizedName>Менеджер подключения отладчика к процессам</LocalizedName>
+  <LocalizedDescription>Расширение дает расширенные возможности для подключения Visual Studio отладчика к web application pools, windows services и другим процессам.</LocalizedDescription>
+  <License>../Ms-PL.rtf</License>
+  <MoreInfoUrl>http://www.karpach.com</MoreInfoUrl>
+</VsixLanguagePack>

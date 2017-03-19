@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugAttachHistory", "DebugAttachHistory\DebugAttachHistory.csproj", "{AC703AE3-D75B-4922-995B-351D7AE28367}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugAttachHistory.Tests", "DebugAttachHistory.Tests\DebugAttachHistory.Tests.csproj", "{308D40D9-34D6-430B-8DD4-88242189376D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AC703AE3-D75B-4922-995B-351D7AE28367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC703AE3-D75B-4922-995B-351D7AE28367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC703AE3-D75B-4922-995B-351D7AE28367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC703AE3-D75B-4922-995B-351D7AE28367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{308D40D9-34D6-430B-8DD4-88242189376D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{308D40D9-34D6-430B-8DD4-88242189376D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{308D40D9-34D6-430B-8DD4-88242189376D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{308D40D9-34D6-430B-8DD4-88242189376D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+EndGlobal
