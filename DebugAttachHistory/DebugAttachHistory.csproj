@@ -162,17 +162,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Colors.cs" />
+    <Compile Include="Controls\SplitButton.cs" />
     <Compile Include="DebugOptions.xaml.cs">
       <DependentUpon>DebugOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="DebugOptionsWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="Helpers\BooleanBoxes.cs" />
+    <Compile Include="Helpers\ValueConverters.cs" />
     <Compile Include="IISExpressRunner.cs" />
-    <Compile Include="ImageButton.xaml.cs">
+    <Compile Include="Controls\ImageButton.xaml.cs">
       <DependentUpon>ImageButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProcessExt.cs" />
-    <Compile Include="ProcessToBeAttached.cs" />
+    <Compile Include="Models\ProcessToBeAttached.cs" />
     <Compile Include="Properties\Settings.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -183,11 +186,11 @@
     <Compile Include="DebugAttachManagerPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
-    <Compile Include="SearchControl.xaml.cs">
+    <Compile Include="Controls\SearchControl.xaml.cs">
       <DependentUpon>SearchControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="StoredProcessInfo.cs" />
-    <Compile Include="ToggleImageButton.xaml.cs">
+    <Compile Include="Models\StoredProcessInfo.cs" />
+    <Compile Include="Controls\ToggleImageButton.xaml.cs">
       <DependentUpon>ToggleImageButton.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -211,6 +214,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Page Include="Controls\SplitButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Resource Include="Resources\attach.png" />
     <Resource Include="Resources\bug.ico" />
     <Resource Include="Resources\iis.png" />
@@ -222,6 +229,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Resource Include="Resources\connect.png" />
+    <Resource Include="Resources\filter.png" />
     <Content Include="Resources\Preview.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -250,7 +259,7 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="ToolbarComboBox.xaml">
+    <Page Include="Controls\ToolbarComboBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -260,17 +269,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="ImageButton.xaml">
+    <Page Include="Controls\ImageButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="SearchControl.xaml">
+    <Page Include="Controls\SearchControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ToggleImageButton.xaml">
+    <Page Include="Controls\ToggleImageButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -289,6 +298,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>

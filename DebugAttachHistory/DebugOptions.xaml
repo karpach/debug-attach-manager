@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
-             xmlns:ux="clr-namespace:Karpach.DebugAttachManager"              
+             xmlns:ux="clr-namespace:Karpach.DebugAttachManager"
+             xmlns:controls="clr-namespace:Karpach.DebugAttachManager.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Name="DebugOptionsToolWindow"
@@ -12,7 +13,8 @@
     <Control.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ToolbarComboBox.xaml" />
+                <ResourceDictionary Source="Controls/ToolbarComboBox.xaml" />
+                <ResourceDictionary Source="Controls/SplitButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <DataTemplate x:Key="ProcessTemplateWithCheckbox">
                 <Grid>
@@ -119,14 +121,27 @@
                     <GradientStop Color="{DynamicResource {x:Static ux:Colors.ToobarBackgroundEnd}}" Offset="1"/>
                 </LinearGradientBrush>
             </StackPanel.Background>
-            <ux:ToggleImageButton x:Name="btnDev" Text="Development IIS" Image="/DebugAttachHistory;component/Resources/local.png" Checked="RbnDevChecked" UnChecked="RbnDevUnChecked" />
-            <ux:ToggleImageButton x:Name="btnIIS" Text="IIS" Image="/DebugAttachHistory;component/Resources/iis.png" Checked="RbnIisChecked" UnChecked="RbnIisUnChecked"/>
-            <ux:ImageButton x:Name="btnRefresh" Text="Refresh" Image="/DebugAttachHistory;component/Resources/refresh.png" Click="BtnRefreshClick" />
+            <controls:SplitButton x:Name="Filter" Header="Filter" Style="{StaticResource SplitButton}" Tag="False" ButtonClick="FilterReset" Click="Filter_MenuItem_Click">
+                <controls:SplitButton.Icon>
+                    <Image Source="/DebugAttachHistory;component/Resources/filter.png"></Image>
+                </controls:SplitButton.Icon>
+                <MenuItem Header="Dev IIS" Name="FilterOne">
+                    <MenuItem.Icon>
+                        <Image Source="/DebugAttachHistory;component/Resources/local.png"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="IIS" Name="FilterTwo">
+                    <MenuItem.Icon>
+                        <Image Source="/DebugAttachHistory;component/Resources/iis.png"></Image>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </controls:SplitButton>
+            <controls:ImageButton x:Name="btnRefresh" Text="Refresh" Image="/DebugAttachHistory;component/Resources/refresh.png" Click="BtnRefreshClick" />
             <Separator />
-            <ux:ImageButton x:Name="btnAttach" Text="Attach" Image="/DebugAttachHistory;component/Resources/attach.png" Click="BtnAttachClick" />
+            <controls:ImageButton x:Name="btnAttach" Text="Attach" Image="/DebugAttachHistory;component/Resources/attach.png" Click="BtnAttachClick" />
         </StackPanel>
         <StackPanel Grid.Row="1" Name="panTop" Orientation="Vertical">
-            <ux:SearchControl x:Name="txtFilter"  TextChanged="TxtFilterTextChanged" Height="26"
+            <controls:SearchControl x:Name="txtFilter"  TextChanged="TxtFilterTextChanged" Height="26"
 				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
 				BorderBrush="{DynamicResource {x:Static ux:Colors.SearchBorder}}"
 				Background="{DynamicResource {x:Static ux:Colors.SearchBackground}}"

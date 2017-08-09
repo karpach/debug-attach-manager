@@ -14,5 +14,7 @@ namespace Karpach.DebugAttachManager
         public static ThemeResourceKey SearchPlaceHolderForeground => EnvironmentColors.ControlEditHintTextBrushKey;
         public static ThemeResourceKey LinkForeground => EnvironmentColors.ControlLinkTextBrushKey;
         public static ThemeResourceKey LinkHoverForeground => EnvironmentColors.MainWindowActiveIconDebuggingBrushKey;
+        public static ThemeResourceKey ToolbarHoverBackground => EnvironmentColors.CommandBarHoverBrushKey;        
+        public static ThemeResourceKey ToolbarHoverBorder => EnvironmentColors.CommandBarHoverOverSelectedIconBorderBrushKey;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Karpach.DebugAttachManager.Models;
 using Microsoft.VisualStudio.Settings;
 using Microsoft.VisualStudio.Shell.Settings;
 

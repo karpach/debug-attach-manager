@@ -5,7 +5,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Threading;
+using System.Windows.Media;
 using EnvDTE80;
+using Karpach.DebugAttachManager.Models;
 using Karpach.DebugAttachManager.Properties;
 
 namespace Karpach.DebugAttachManager
@@ -64,60 +67,12 @@ namespace Karpach.DebugAttachManager
             {
                 yield return new KeyValuePair<string,string>(engine.Name, $"{engine.ID}");
             }            
-        }
-
-        private void RbnDevChecked(object sender, RoutedEventArgs e)
-        {
-            btnIIS.IsChecked = false;
-            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName,"iisexpress")).Select(p=>new ProcessExt(p)).ToList();
-            lstSearchProcesses.ItemsSource = _processes;
-        }
-
-        private void RbnDevUnChecked(object sender, RoutedEventArgs e)
-        {
-            RbnAllChecked(sender, e);
-        }
-
-        private void RbnIisChecked(object sender, RoutedEventArgs e)
-        {
-            btnDev.IsChecked = false;            
-            _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("w3wp")).Select(p => new ProcessExt(p)).ToList();
-            lstSearchProcesses.ItemsSource = _processes;
-        }
-
-        private void RbnIisUnChecked(object sender, RoutedEventArgs e)
-        {
-            RbnAllChecked(sender, e);
-        }
+        }                
 
         private void BtnRefreshClick(object sender, RoutedEventArgs e)
         {            
-            if (btnIIS.IsChecked)
-            {
-                RbnIisChecked(sender,e);
-            } 
-            else if (btnDev.IsChecked)
-            {
-                RbnDevChecked(sender, e);
-            }
-            else
-            {
-                RbnAllChecked(sender, e);
-            }                        
-        }        
-
-        private void RbnAllChecked(object sender, RoutedEventArgs e)
-        {            
-            if (string.IsNullOrEmpty(txtFilter.Text))
-            {
-                _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
-                lstSearchProcesses.ItemsSource = _processes;
-            }
-            else
-            {
-              TxtFilterTextChanged(sender, null);   
-            }
-        }
+            FilterRefresh();                       
+        }               
 
         private void TxtFilterTextChanged(object sender, TextChangedEventArgs e)
         {
@@ -241,6 +196,83 @@ namespace Karpach.DebugAttachManager
             SaveProcessHash(p);
         }
 
+        private void Filter_MenuItem_Click(Object sender, RoutedEventArgs e)
+        {
+            var menu = e.OriginalSource as MenuItem;
+            if (menu != null && string.Equals(menu.Name, "FilterOne"))
+            {
+                FilterDevIIS = !FilterDevIIS;
+                if (FilterDevIIS)
+                {                    
+                    FilterIIS = false;                    
+                }                
+            }
+            if (menu != null && string.Equals(menu.Name, "FilterTwo"))
+            {
+                FilterIIS = !FilterIIS;
+                if (FilterDevIIS)
+                {
+                    FilterDevIIS = false;                    
+                }                
+            }            
+            Debug.WriteLine(menu.Name);
+            FilterRefresh();
+        }
+
+        private void FilterRefresh()
+        {
+            if (FilterDevIIS)
+            {                
+                FilterTwo.Background = Brushes.Transparent;
+                FilterOne.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
+                _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress")).Select(p => new ProcessExt(p)).ToList();
+                lstSearchProcesses.ItemsSource = _processes;
+            }
+            else
+            {
+                FilterOne.Background = Brushes.Transparent;
+            }            
+            if (FilterIIS)
+            {                
+                FilterOne.Background = Brushes.Transparent;
+                FilterTwo.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
+                _processes = Process.GetProcesses().Where(p => p.ProcessName.Contains("w3wp")).Select(p => new ProcessExt(p)).ToList();
+                lstSearchProcesses.ItemsSource = _processes;
+            }
+            else
+            {
+                FilterTwo.Background = Brushes.Transparent;
+            }
+            if (!FilterIIS && !FilterDevIIS)
+            {
+                if (string.IsNullOrEmpty(txtFilter.Text))
+                {
+                    _processes = Process.GetProcesses().Select(p => new ProcessExt(p)).ToList();
+                    lstSearchProcesses.ItemsSource = _processes;
+                }
+                else
+                {
+                    TxtFilterTextChanged(null, null);
+                }                
+            }
+            Filter.Tag = FilterIIS || FilterDevIIS;
+        }
+
+        private void FilterReset(Object sender, RoutedEventArgs e)
+        {
+            var menu = e.OriginalSource as MenuItem;
+            if (menu != null)
+            {
+                foreach (MenuItem item in menu.Items)
+                {
+                    item.Background = Brushes.Transparent;
+                }
+                FilterIIS = false;
+                FilterDevIIS = false;
+                FilterRefresh();
+            }            
+        }
+
         #endregion
 
         #region Helper methods
@@ -284,8 +316,10 @@ namespace Karpach.DebugAttachManager
         #region Private Variables
 
         private List<ProcessExt> _processes;
-        private readonly Lazy<KeyValuePair<string,string>[]> _debugModes;        
+        private readonly Lazy<KeyValuePair<string,string>[]> _debugModes;
+        protected bool FilterDevIIS;
+        protected bool FilterIIS;
 
-        #endregion        
+        #endregion
     }
 }
