@@ -6,6 +6,7 @@
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
              xmlns:ux="clr-namespace:Karpach.DebugAttachManager"
              xmlns:controls="clr-namespace:Karpach.DebugAttachManager.Controls"
+             xmlns:helpers="clr-namespace:Karpach.DebugAttachManager.Helpers"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Name="DebugOptionsToolWindow"
@@ -16,6 +17,7 @@
                 <ResourceDictionary Source="Controls/ToolbarComboBox.xaml" />
                 <ResourceDictionary Source="Controls/SplitButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <helpers:TitleConverter x:Key="TitleConverter"/>
             <DataTemplate x:Key="ProcessTemplateWithCheckbox">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -76,8 +78,8 @@
             </DataTemplate>
             <DataTemplate x:Key="ProcessTemplate">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0"></TextBlock>
-                    <TextBlock Text="{Binding Title,StringFormat=({0})}">
+                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0" ToolTip="{Binding Title}"></TextBlock>
+                    <TextBlock Text="{Binding Title, Converter={StaticResource TitleConverter}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
@@ -136,6 +138,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </controls:SplitButton>
+            <controls:ToggleImageButton x:Name="btnConnect" Text="Connect" Image="/DebugAttachHistory;component/Resources/connect.png" Checked="BtnConnectClick" UnChecked="BtnConnectClear" />
             <controls:ImageButton x:Name="btnRefresh" Text="Refresh" Image="/DebugAttachHistory;component/Resources/refresh.png" Click="BtnRefreshClick" />
             <Separator />
             <controls:ImageButton x:Name="btnAttach" Text="Attach" Image="/DebugAttachHistory;component/Resources/attach.png" Click="BtnAttachClick" />

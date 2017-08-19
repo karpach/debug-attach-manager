@@ -12,7 +12,7 @@
         <ToggleButton Checked="ToggleButtonChecked" Unchecked="ToggleButtonUnChecked" IsChecked="{Binding Path=IsChecked, ElementName=root}">
             <ToggleButton.Template>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Border" BorderThickness="1" Margin="2,3,2,3">
+                    <Border x:Name="Border" BorderThickness="1">
                         <StackPanel x:Name="Container"  Orientation="Horizontal">
                             <Image Source="{Binding Path=Image, ElementName=root}" Width="16" Margin="3,0,0,0"/>
                             <TextBlock Text="{Binding Path=Text, ElementName=root}" Height="Auto" VerticalAlignment="Center" Padding="6,0,3,2" 
@@ -21,7 +21,12 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="true">
-                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static Shell:VsBrushes.CommandBarSelectedBorderKey}}" />
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static ux:Colors.ToolbarHoverBackground}}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static ux:Colors.ToolbarHoverBorder}}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static ux:Colors.ToolbarHoverBackground}}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {x:Static ux:Colors.ToolbarHoverBorder}}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

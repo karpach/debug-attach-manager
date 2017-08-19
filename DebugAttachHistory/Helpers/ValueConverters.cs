@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
@@ -48,5 +49,23 @@ namespace Karpach.DebugAttachManager.Helpers
         }
 
         #endregion
+    }
+
+    internal class TitleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string commandLine = (string) value;
+            if (commandLine == null)
+            {
+                return string.Empty;
+            }
+            return commandLine.Length > 15 ? string.Empty : $"({commandLine})";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
