@@ -18,8 +18,9 @@
                 <ResourceDictionary Source="Controls/SplitButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <helpers:TitleConverter x:Key="TitleConverter"/>
+            <helpers:ToolTipConverter x:Key="ToolTipConverter"/>
             <DataTemplate x:Key="ProcessTemplateWithCheckbox">
-                <Grid>
+                <Grid ToolTip="{Binding Process.Title,Converter={StaticResource ToolTipConverter}}" HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="110" />
@@ -29,7 +30,7 @@
                         <CheckBox Content="{Binding Process.ProcessName}" IsChecked="{Binding Checked}" 
             				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
             				Checked="CheckBoxChecked" Margin="0 0 10 0" Unchecked="CheckBoxUnchecked"/>
-                        <TextBlock Text="{Binding Process.Title,StringFormat=({0})}">
+                        <TextBlock Text="{Binding Process.Title,Converter={StaticResource TitleConverter}}">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
@@ -77,8 +78,8 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ProcessTemplate">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0" ToolTip="{Binding Title}"></TextBlock>
+                <StackPanel Orientation="Horizontal" ToolTip="{Binding Title,Converter={StaticResource ToolTipConverter}}" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0"></TextBlock>
                     <TextBlock Text="{Binding Title, Converter={StaticResource TitleConverter}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">

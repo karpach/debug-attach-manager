@@ -33,7 +33,7 @@ namespace Karpach.DebugAttachManager
         public DebugOptionsControl()
         {
             InitializeComponent();            
-            _processes = GetProcesses().ToList();
+            _processes = GetProcesses(_remoteServer, _remoteServerPort).ToList();
             _debugModes = new Lazy<KeyValuePair<string, string>[]>(() => GetDebugModes().ToArray());            
             lstSearchProcesses.ItemsSource = _processes;                        
         }
@@ -83,6 +83,10 @@ namespace Karpach.DebugAttachManager
                 _remoteServerPort = dlg.PortNumber;
                 FilterRefresh();
             }
+            else
+            {
+                btnConnect.IsChecked = false;
+            }
         }
 
         private void BtnConnectClear(object sender, RoutedEventArgs e)
@@ -102,7 +106,7 @@ namespace Karpach.DebugAttachManager
             lstSearchProcesses.ItemsSource =
                 _processes.Where(
                     p => p.ProcessName.ToLower().Contains(txtFilter.Text.ToLower()) 
-                         || p.Title.ToLower().Contains(txtFilter.Text.ToLower()));
+                         || p.Title != null && p.Title.ToLower().Contains(txtFilter.Text.ToLower()));
         }
 
         private void BtnAttachClick(object sender, RoutedEventArgs e)
@@ -112,55 +116,58 @@ namespace Karpach.DebugAttachManager
 
         private bool Attach(object sender, RoutedEventArgs e)
         {
-            EnvDTE.Processes processes = ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).LocalProcesses;
-            var selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
-            if (selectedProcesses.Count == 0)
+            if (lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Count(p => p.Checked) == 0)
             {
+                bool skipCheck = IsLoaded;
                 if (!IsLoaded)
                 {
-                    DebugOptionsToolWindowLoaded(sender, e);
-                    selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Where(p => p.Checked).ToList();
+                    DebugOptionsToolWindowLoaded(sender, e);                    
                 }
-                if (selectedProcesses.Count == 0)
+                if (skipCheck || lstAttachProcesses.Items.OfType<ProcessToBeAttached>().Count(p => p.Checked) == 0)
                 {
                     MessageBox.Show("You didn't select any processes for attachment.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return false;
                 }
             }
-            bool found = false;
-            foreach (Process2 process in processes)
+            var selectedProcesses = lstAttachProcesses.Items.OfType<ProcessToBeAttached>()
+                .Where(p => p.Checked)
+                .GroupBy(p => new
+                {
+                    p.Process.ServerName,
+                    p.Process.PortNumber
+                })
+                .ToDictionary(x=>x.Key, x=>x.ToList());
+            foreach (var key in selectedProcesses.Keys)
             {
-                ProcessExt pp;
-                try
+                EnvDTE.Processes processes = GetDebugProcesses(key.ServerName, key.PortNumber);
+                bool found = false;
+                
+                foreach (Process2 process in processes)
                 {
-                    pp = new ProcessExt(Process.GetProcessById(process.ProcessID));
-                }
-                catch (ArgumentException)
-                {                    
-                    continue;
-                }
-                var selectedProcess = selectedProcesses.FirstOrDefault(p => pp.Hash == p.Process.Hash);
-                if (!string.IsNullOrEmpty(selectedProcess?.DebugMode))
-                {
-                    foreach (Engine engine in ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).Transports.Item("Default").Engines)
+                    ProcessExt pp = new ProcessExt(process.Name, process.ProcessID, key.ServerName, key.PortNumber);                    
+                    var selectedProcess = selectedProcesses[key].FirstOrDefault(p => pp.Hash == p.Process.Hash);
+                    if (!string.IsNullOrEmpty(selectedProcess?.DebugMode))
                     {
-                        if (string.Equals(engine.ID, selectedProcess.DebugMode))
+                        foreach (Engine engine in ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).Transports.Item("Default").Engines)
                         {
-                            process.Attach2(new[] { engine });
+                            if (string.Equals(engine.ID, selectedProcess.DebugMode))
+                            {
+                                process.Attach2(new[] { engine });
+                            }
                         }
-                    }                    
-                    found = true;
+                        found = true;
+                    }
+                    else if (selectedProcess != null)
+                    {
+                        process.Attach();
+                        found = true;
+                    }
                 }
-                else if (selectedProcess != null)
+                if (!found)
                 {
-                    process.Attach();
-                    found = true;
-                }
-            }
-            if (!found)
-            {
-                MessageBox.Show("Selected processes are not running. Try to run your application first.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
+                    MessageBox.Show("Selected processes are not running. Try to run your application first.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }                
             }
             return true;
         }
@@ -177,13 +184,21 @@ namespace Karpach.DebugAttachManager
                     {
                         foreach (var p in processes)
                         {
-                            lstAttachProcesses.Items.Add(new ProcessToBeAttached { Process = p, Checked = IsChecked(p.Hash), DebugMode = Settings.Default.Processes[pHash].DebugMode });
+                            lstAttachProcesses.Items.Add(new ProcessToBeAttached
+                            {
+                                Process = p,
+                                Checked = IsChecked(p.Hash),
+                                DebugMode = Settings.Default.Processes[pHash].DebugMode                                
+                            });
                         }   
                     }
                     else
                     {
                         lstAttachProcesses.Items.Add(new ProcessToBeAttached {
-                            Process = new ProcessExt(Settings.Default.Processes[pHash].ProcessName, Settings.Default.Processes[pHash].Title), 
+                            Process = new ProcessExt(Settings.Default.Processes[pHash].ProcessName, 
+                                                     Settings.Default.Processes[pHash].Title, 
+                                                     Settings.Default.Processes[pHash].RemoteServerName,
+                                                     Settings.Default.Processes[pHash].RemotePortNumber), 
                             Checked = IsChecked(hash),
                             DebugMode = Settings.Default.Processes[pHash].DebugMode
                         });
@@ -248,7 +263,7 @@ namespace Karpach.DebugAttachManager
             {                
                 FilterTwo.Background = Brushes.Transparent;
                 FilterOne.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
-                _processes = GetProcesses().Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress")).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress")).ToList();
                 lstSearchProcesses.ItemsSource = _processes;
             }
             else
@@ -259,7 +274,7 @@ namespace Karpach.DebugAttachManager
             {                
                 FilterOne.Background = Brushes.Transparent;
                 FilterTwo.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
-                _processes = GetProcesses().Where(p => p.ProcessName.Contains("w3wp")).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("w3wp")).ToList();
                 lstSearchProcesses.ItemsSource = _processes;
             }
             else
@@ -268,9 +283,9 @@ namespace Karpach.DebugAttachManager
             }
             if (!FilterIIS && !FilterDevIIS)
             {
+                _processes = GetProcesses(_remoteServer, _remoteServerPort).ToList();
                 if (string.IsNullOrEmpty(txtFilter.Text))
-                {
-                    _processes = GetProcesses().ToList();
+                {                    
                     lstSearchProcesses.ItemsSource = _processes;
                 }
                 else
@@ -319,7 +334,9 @@ namespace Karpach.DebugAttachManager
                                                                              Title = process.Process.Title,
                                                                              ProcessName = process.Process.ProcessName,
                                                                              Selected = process.Checked,
-                                                                             DebugMode = process.DebugMode
+                                                                             DebugMode = process.DebugMode,
+                                                                             RemoteServerName = process.Process.ServerName,
+                                                                             RemotePortNumber = process.Process.PortNumber
                                                                          });
             }
             Settings.Default.Save();
@@ -334,21 +351,39 @@ namespace Karpach.DebugAttachManager
             }
         }
 
-        private IEnumerable<ProcessExt> GetProcesses()
+        private static IEnumerable<ProcessExt> GetProcesses(string remoteServer, long? remoteServerPort)
         {
-            if (string.IsNullOrEmpty(_remoteServer))
+            var result = new List<ProcessExt>();
+            if (string.IsNullOrEmpty(remoteServer))
+            {                
+                foreach (EnvDTE.Process p in ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).LocalProcesses)
+                {
+                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort));
+                }
+            }
+            else
             {
-                return Process.GetProcesses().Select(p=> new ProcessExt(p));
+                Debugger2 db = (Debugger2)DebugAttachManagerPackage.DTE.Debugger;
+                Transport trans = db.Transports.Item("Default");
+                
+                foreach (EnvDTE.Process p in db.GetProcesses(trans, remoteServerPort == null ? remoteServer : $"{remoteServer}:{remoteServerPort}"))
+                {
+                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort));
+                }
             }            
+            return result;
+        }
+
+        private static EnvDTE.Processes GetDebugProcesses(string remoteServer, long? remoteServerPort)
+        {
+            if (string.IsNullOrEmpty(remoteServer))
+            {
+                return ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).LocalProcesses;
+            }
             Debugger2 db = (Debugger2)DebugAttachManagerPackage.DTE.Debugger;
             Transport trans = db.Transports.Item("Default");
-
-            var result = new List<ProcessExt>();
-            foreach (EnvDTE.Process p in db.GetProcesses(trans, _remoteServerPort == null ? _remoteServer : $"{_remoteServer}:{_remoteServerPort}"))
-            {
-                result.Add(new ProcessExt(p.Name, p.ProcessID, _remoteServer));
-            }
-            return result;
+            
+            return db.GetProcesses(trans, remoteServerPort == null ? remoteServer : $"{remoteServer}:{remoteServerPort}");
         }
 
         #endregion

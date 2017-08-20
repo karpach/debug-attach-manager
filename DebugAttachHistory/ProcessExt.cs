@@ -3,54 +3,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Runtime.Caching;
-using Process = System.Diagnostics.Process;
 
 namespace Karpach.DebugAttachManager
 {
     public class ProcessExt
     {
-        private static MemoryCache _cache = MemoryCache.Default;
+        private static readonly MemoryCache Cache = MemoryCache.Default;
+        public const string TitlePrefix = "~|~";        
 
-        public ProcessExt(Process process)
-        {
-            ProcessName = process.ProcessName;            
-            Title = GetTitle(process.ProcessName, process.Id);            
-        }
-
-        public ProcessExt(string processName, int processId, string serverName)
+        public ProcessExt(string processName, int processId, string serverName, long? portNumber)
         {
             if (processName.Contains("\\"))
             {
                 ProcessName = processName.Substring(processName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-                Title = processName;
+                Title = GetTitle(ProcessName, processId, serverName);
+                if (string.IsNullOrEmpty(Title))
+                {
+                    Title = processName;
+                }
             }
             else
             {
                 ProcessName = processName;
                 Title = GetTitle(processName, processId, serverName);
             }
+            ServerName = serverName;
+            PortNumber = portNumber;
         }
 
 
-        public ProcessExt(string processName, string title)
+        public ProcessExt(string processName, string title, string serverName, long? portNumber)
         {
             Title = title;
-            ProcessName = processName;            
+            ProcessName = processName;
+            ServerName = serverName;
+            PortNumber = portNumber;
         }
 
         public string ProcessName { get; }
 
         public string Title { get; }
+
+        public string ServerName { get; set; }
+
+        public long? PortNumber { get; set; }
         
 
-        public int Hash => string.Concat(ProcessName, Title).GetHashCode();
+        public int Hash => string.Concat(ProcessName, Title, ServerName, PortNumber).GetHashCode();
 
         private static IEnumerable<WmiProcess> GetWmiProcesses(string serverName = null)
         {
             string key = serverName ?? "localhost";
-            if (_cache.Contains(key))
+            if (Cache.Contains(key))
             {
-                return _cache[key] as IEnumerable<WmiProcess>;
+                return Cache[key] as IEnumerable<WmiProcess>;
             }            
 
             ManagementScope scope = null;
@@ -71,7 +77,7 @@ namespace Karpach.DebugAttachManager
                 }
                 catch
                 {
-                    _cache[key] = null;
+                    Cache[key] = null;
                     return null;
                 }
             }
@@ -99,7 +105,7 @@ namespace Karpach.DebugAttachManager
                 }
 
             }
-            _cache.Add(key, result, DateTime.Now.AddSeconds(5));
+            Cache.Add(key, result, DateTime.Now.AddSeconds(5));
             return result;
         }        
 
@@ -114,7 +120,7 @@ namespace Karpach.DebugAttachManager
             {
                 return String.Empty;
             }
-            if (string.Equals(processName, "w3wp", StringComparison.OrdinalIgnoreCase))
+            if (processName.StartsWith("w3wp", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(process.CommandLine))
             {
                 int startIndex = process.CommandLine.IndexOf("-ap ", StringComparison.Ordinal) + 5; //remove the -ap as well as the space and the "
                 if (startIndex == -1)
@@ -122,9 +128,9 @@ namespace Karpach.DebugAttachManager
                     return process.CommandLine;
                 }
                 int endIndex = process.CommandLine.IndexOf("-", startIndex, StringComparison.Ordinal) - 2; //remove the closing "                        
-                return process.CommandLine.Substring(startIndex, endIndex - startIndex);
+                return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
             }
-            if (string.Equals(processName, "iisexpress", StringComparison.OrdinalIgnoreCase))
+            if (processName.StartsWith("iisexpress", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(process.CommandLine))
             {
                 int startIndex = process.CommandLine.IndexOf("/site:", StringComparison.Ordinal) + 7; //remove the /site: as well as the "
                 if (startIndex == -1)
@@ -132,9 +138,9 @@ namespace Karpach.DebugAttachManager
                     return string.Empty;
                 }
                 int endIndex = process.CommandLine.IndexOf("\"", startIndex + 7, StringComparison.Ordinal); //remove the closing "                                                
-                return process.CommandLine.Substring(startIndex, endIndex - startIndex);
+                return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
             }
-            if (processName.Contains("WebDev"))
+            if (processName.Contains("WebDev") && !string.IsNullOrEmpty(process.CommandLine))
             {
                 var startIndex = process.CommandLine.IndexOf("/port:", StringComparison.Ordinal) + 6; //remove the /site: as well as the "
                 if (startIndex == -1)
@@ -142,10 +148,10 @@ namespace Karpach.DebugAttachManager
                     return string.Empty;
                 }
                 var endIndex = process.CommandLine.IndexOf(" ", startIndex, StringComparison.Ordinal); //remove the closing "                                                
-                return process.CommandLine.Substring(startIndex, endIndex - startIndex);
+                return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
             }
             return process.CommandLine;
-        }
+        }        
 
         private class WmiProcess
         {

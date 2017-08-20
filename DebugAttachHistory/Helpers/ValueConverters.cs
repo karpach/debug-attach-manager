@@ -60,7 +60,25 @@ namespace Karpach.DebugAttachManager.Helpers
             {
                 return string.Empty;
             }
-            return commandLine.Length > 15 ? string.Empty : $"({commandLine})";
+            return commandLine.StartsWith(ProcessExt.TitlePrefix) ? $"({commandLine.Substring(3)})" : string.Empty;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class ToolTipConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string commandLine = (string)value;
+            if (commandLine == null)
+            {
+                return string.Empty;
+            }
+            return commandLine.StartsWith(ProcessExt.TitlePrefix) ? null : commandLine;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

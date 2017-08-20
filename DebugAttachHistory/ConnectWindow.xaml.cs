@@ -2,6 +2,7 @@
 using System.Management;
 using System.Windows;
 using EnvDTE80;
+using Karpach.DebugAttachManager.Properties;
 
 namespace Karpach.DebugAttachManager
 {
@@ -33,6 +34,7 @@ namespace Karpach.DebugAttachManager
         public ConnectWindow()
         {
             InitializeComponent();
+            txtServerName.Text = Settings.Default.RemoteServer;
         }
 
         private void ConnectOnClick(object sender, RoutedEventArgs e)
@@ -82,6 +84,8 @@ namespace Karpach.DebugAttachManager
             }
 
             DialogResult = true;
+            Settings.Default.RemoteServer = txtServerName.Text;
+            Settings.Default.Save();
             Close();
         }        
     }
