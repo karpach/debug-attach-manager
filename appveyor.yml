@@ -5,8 +5,7 @@ install:
   - ps: (new-object Net.WebClient).DownloadString("https://raw.github.com/madskristensen/ExtensionScripts/master/AppVeyor/vsix.ps1") | iex
 
 before_build:
-  - ps: nuget restore -Verbosity quiet
-  - ps: Vsix-IncrementVsixVersion | Vsix-UpdateBuildVersion
+  - ps: nuget restore -Verbosity quiet  
   
 build_script:
   - ps: msbuild /p:configuration=Release /p:platform="Any CPU" /p:DeployExtension=false /p:ZipPackageCompressionLevel=normal
