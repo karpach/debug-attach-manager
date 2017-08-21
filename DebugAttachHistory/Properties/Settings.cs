@@ -88,6 +88,10 @@ namespace Karpach.DebugAttachManager.Properties
             }
             if (!string.IsNullOrEmpty(RemoteServer))
             {
+                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
+                {
+                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
+                }
                 _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteServer", RemoteServer);
             }            
         }

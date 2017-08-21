@@ -76,7 +76,7 @@ namespace Karpach.DebugAttachManager
             }
             catch
             {
-                MessageBoxResult result = MessageBox.Show($"Unable to connect to {txtServerName.Text} WMI service. Please check permissions.", "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                MessageBoxResult result = MessageBox.Show($"Unable to connect to {txtServerName.Text} WMI service. Please check permissions. You can use WBEMTest.exe to test your WMI access. If you are not in a Domain, UAC on remote machine will prevent remote access.", "Warning", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                 if (result == MessageBoxResult.Cancel)
                 {
                     return;

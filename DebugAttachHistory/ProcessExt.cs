@@ -130,7 +130,7 @@ namespace Karpach.DebugAttachManager
                 int endIndex = process.CommandLine.IndexOf("-", startIndex, StringComparison.Ordinal) - 2; //remove the closing "                        
                 return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
             }
-            if (processName.StartsWith("iisexpress", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(process.CommandLine))
+            if (string.Equals(processName, "iisexpress.exe", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(process.CommandLine))
             {
                 int startIndex = process.CommandLine.IndexOf("/site:", StringComparison.Ordinal) + 7; //remove the /site: as well as the "
                 if (startIndex == -1)

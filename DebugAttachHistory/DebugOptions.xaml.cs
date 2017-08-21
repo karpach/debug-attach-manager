@@ -263,7 +263,7 @@ namespace Karpach.DebugAttachManager
             {                
                 FilterTwo.Background = Brushes.Transparent;
                 FilterOne.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
-                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress")).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress.exe")).ToList();
                 lstSearchProcesses.ItemsSource = _processes;
             }
             else
