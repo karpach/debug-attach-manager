@@ -218,13 +218,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Resource Include="Screenshots\screenshot7.png" />
-    <Resource Include="Screenshots\screenshot6.png" />
-    <Resource Include="Screenshots\screenshot5.png" />
-    <Resource Include="Screenshots\screenshot4.png" />
-    <Resource Include="Screenshots\screenshot3.png" />
-    <Resource Include="Screenshots\screenshot2.png" />
-    <Resource Include="Screenshots\screenshot1.png" />
     <Page Include="ConnectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -254,7 +247,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="packages.config" />
-    <None Include="readme.md" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
