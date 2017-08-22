@@ -248,7 +248,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="..\LICENSE">
-      <Link>LICENSE</Link>
+      <Link>Resources\LICENSE</Link>
     </None>
     <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
