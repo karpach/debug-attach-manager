@@ -5,7 +5,7 @@
     <DisplayName>Debug Attach Manager</DisplayName>
     <Description xml:space="preserve">Extension provides extended abilities to attach Visual Studio debuger to web application pools, windows services and other processes.</Description>
     <MoreInfo>http://www.karpach.com</MoreInfo>
-    <License>Ms-PL.rtf</License>
+    <License>LICENSE</License>
     <ReleaseNotes>notes.txt</ReleaseNotes>
     <Icon>bug.ico</Icon>
     <PreviewImage>Resources\Preview.png</PreviewImage>
