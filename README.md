@@ -37,4 +37,4 @@ The extension also supports basic remote debugging:
 
 The logged in user needs to have access to the remote PC. 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/p4ofuplxtx9fabm5?svg=true)](https://ci.appveyor.com/project/karpach/debug-attach-manager)
+[![Build status](https://ci.appveyor.com/api/projects/status/9mw67f51ocxiychg?svg=true)](https://ci.appveyor.com/project/karpach/debug-attach-manager)
