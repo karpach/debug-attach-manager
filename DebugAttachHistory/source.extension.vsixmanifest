@@ -9,7 +9,7 @@
     <ReleaseNotes>notes.txt</ReleaseNotes>
     <Icon>bug.ico</Icon>
     <PreviewImage>Resources\Preview.png</PreviewImage>
-    <Tags>debug,attach,attach to process,quick debug</Tags>
+    <Tags>debug,attach,attach to process,quick debug,remote debug</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,]" />
