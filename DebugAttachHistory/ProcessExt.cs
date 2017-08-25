@@ -127,7 +127,7 @@ namespace Karpach.DebugAttachManager
                 {
                     return process.CommandLine;
                 }
-                int endIndex = process.CommandLine.IndexOf("-", startIndex, StringComparison.Ordinal) - 2; //remove the closing "                        
+                int endIndex = process.CommandLine.IndexOf("\" -", startIndex, StringComparison.Ordinal); //remove the closing "                        
                 return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
             }
             if (string.Equals(processName, "iisexpress.exe", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(process.CommandLine))
