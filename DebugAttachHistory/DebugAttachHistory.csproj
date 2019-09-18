@@ -27,7 +27,7 @@
   <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)\devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp "c:\Projects\Apts\Apartments\Apts.Web\Main\Trunk\Source\Apts.Web.sln"</StartArguments>
+    <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>bug.ico</ApplicationIcon>

@@ -113,10 +113,10 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="26" />
             <RowDefinition Height="26"/>
-            <RowDefinition />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="150"/>
-        </Grid.RowDefinitions>
+            <RowDefinition Height="350*" MinHeight="30" />
+			<RowDefinition Height="3" />
+			<RowDefinition Height="135*" MinHeight="60" />
+		</Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Orientation="Horizontal">
             <StackPanel.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -156,16 +156,23 @@
 			Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
 			Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
 			MouseDoubleClick="LstSearchProcessesMouseDoubleClick" Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
-        <TextBlock Grid.Row="3" Text="Processes to be attached:"  Padding="10,15,0,0" FontSize="12" Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}" />
-        <ListBox Grid.Row="4" Name="lstAttachProcesses" Height="150" ItemTemplate="{StaticResource ProcessTemplateWithCheckbox}" 
-			Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
-			Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
-			Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
-    </Grid>
+		<GridSplitter Grid.Row="3" Height="3" HorizontalAlignment="Stretch" />
+		<Grid Grid.Row="4">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="35" />
+				<RowDefinition />
+			</Grid.RowDefinitions>
+			<TextBlock Grid.Row="0" Text="Processes to be attached:"  Padding="10,10,0,0" FontSize="12" Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}" />
+			<ListBox  Grid.Row="1" Name="lstAttachProcesses" ItemTemplate="{StaticResource ProcessTemplateWithCheckbox}"
+					Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
+					Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
+					Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+				<ListBox.ItemContainerStyle>
+					<Style TargetType="ListBoxItem">
+						<Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+					</Style>
+				</ListBox.ItemContainerStyle>
+			</ListBox>
+		</Grid>
+	</Grid>
 </UserControl>
