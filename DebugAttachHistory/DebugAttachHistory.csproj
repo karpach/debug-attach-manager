@@ -171,6 +171,7 @@
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Constants.cs" />
     <Compile Include="Controls\SplitButton.cs" />
     <Compile Include="DebugOptions.xaml.cs">
       <DependentUpon>DebugOptions.xaml</DependentUpon>
@@ -202,6 +203,9 @@
     <Compile Include="Controls\ToggleImageButton.xaml.cs">
       <DependentUpon>ToggleImageButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SelectedColumns.xaml.cs">
+      <DependentUpon>SelectedColumns.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -224,6 +228,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\SplitButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SelectedColumns.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

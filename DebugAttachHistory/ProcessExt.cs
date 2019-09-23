@@ -29,7 +29,8 @@ namespace Karpach.DebugAttachManager
             }
             ServerName = serverName;
             PortNumber = portNumber;
-        }
+			ProcessId = processId;
+		}
 
 
         public ProcessExt(string processName, string title, string serverName, long? portNumber)
@@ -47,7 +48,24 @@ namespace Karpach.DebugAttachManager
         public string ServerName { get; set; }
 
         public long? PortNumber { get; set; }
-        
+
+		public string CommandLine
+		{
+			get
+			{
+				string result = string.Empty;
+				if (!string.IsNullOrEmpty(Title))
+				{
+					if (!Title.StartsWith(TitlePrefix))
+					{
+						return Title;
+					}
+				}
+				return result;
+			}
+		}
+
+		public int? ProcessId { get; set; }
 
         public int Hash => string.Concat(ProcessName, Title, ServerName, PortNumber).GetHashCode();
 
@@ -149,7 +167,7 @@ namespace Karpach.DebugAttachManager
                 }
                 var endIndex = process.CommandLine.IndexOf(" ", startIndex, StringComparison.Ordinal); //remove the closing "                                                
                 return TitlePrefix + process.CommandLine.Substring(startIndex, endIndex - startIndex);
-            }
+            }            
             return process.CommandLine;
         }        
 

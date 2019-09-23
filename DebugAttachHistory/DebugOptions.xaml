@@ -6,7 +6,7 @@
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
              xmlns:ux="clr-namespace:Karpach.DebugAttachManager"
              xmlns:controls="clr-namespace:Karpach.DebugAttachManager.Controls"
-             xmlns:helpers="clr-namespace:Karpach.DebugAttachManager.Helpers"
+             xmlns:helpers="clr-namespace:Karpach.DebugAttachManager.Helpers"             
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              Name="DebugOptionsToolWindow"
@@ -17,10 +17,9 @@
                 <ResourceDictionary Source="Controls/ToolbarComboBox.xaml" />
                 <ResourceDictionary Source="Controls/SplitButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <helpers:TitleConverter x:Key="TitleConverter"/>
-            <helpers:ToolTipConverter x:Key="ToolTipConverter"/>
-            <DataTemplate x:Key="ProcessTemplateWithCheckbox">
-                <Grid ToolTip="{Binding Process.Title,Converter={StaticResource ToolTipConverter}}" HorizontalAlignment="Stretch">
+			<helpers:TitleConverter x:Key="TitleConverter"/>
+			<DataTemplate x:Key="ProcessTemplateWithCheckbox">
+                <Grid HorizontalAlignment="Stretch">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="110" />
@@ -78,8 +77,8 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="ProcessTemplate">
-                <StackPanel Orientation="Horizontal" ToolTip="{Binding Title,Converter={StaticResource ToolTipConverter}}" HorizontalAlignment="Stretch">
-                    <TextBlock Text="{Binding ProcessName}" Margin="0 0 10 0"></TextBlock>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{Binding ProcessName}" Margin="5 0 10 0"></TextBlock>
                     <TextBlock Text="{Binding Title, Converter={StaticResource TitleConverter}}">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -106,6 +105,62 @@
                         </TransformGroup>
                     </Setter.Value>
                 </Setter>
+            </Style>
+            <Style TargetType="{x:Type DataGridColumnHeader}">
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                            <Grid Name="HeaderGrid">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="BackgroundBorder" BorderThickness="0,0,1,1"  BorderBrush="{DynamicResource {x:Static ux:Colors.SearchBorder}}" Grid.ColumnSpan="2" />
+                                <ContentPresenter  Margin="6,3,6,3" VerticalAlignment="Center" Grid.Column="0" />
+                                <Path x:Name="SortArrow" Visibility="Collapsed" Data="M0,0 L1,0 0.5,1 z" Stretch="Fill" 
+                            Grid.Column="1" Width="8" Height="6" Fill="{Binding ElementName=lstSearchProcesses, Path=Foreground}" Margin="0,0,8,0" 
+                            VerticalAlignment="Center" RenderTransformOrigin="0.5,0.4" />
+                                <Thumb x:Name="PART_RightHeaderGripper" HorizontalAlignment="Right" Cursor="SizeWE" 
+                                   Grid.Column="1" >
+                                    <Thumb.Style>
+                                        <Style TargetType="{x:Type Thumb}">
+                                            <Setter Property="Width" Value="2" />
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type Thumb}">
+                                                        <Border Background="Transparent"/>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Thumb.Style>
+                                </Thumb>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Background" TargetName="HeaderGrid"  Value="{DynamicResource {x:Static ux:Colors.ToolbarHoverBackground}}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="true">
+                                    <Setter Property="Background" TargetName="HeaderGrid"   Value="{DynamicResource {x:Static ux:Colors.ToolbarPressedBackground}}" />
+                                </Trigger>
+                                <Trigger Property="SortDirection" Value="Ascending">
+                                    <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="SortArrow" Property="RenderTransform">
+                                        <Setter.Value>
+                                            <RotateTransform Angle="180" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                                <Trigger Property="SortDirection" Value="Descending">
+                                    <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <EventSetter Event="MouseRightButtonDown" Handler="LstSearchProcessesHeaderClick" />
+                <Setter Property="Height" Value="26"></Setter>
             </Style>
         </ResourceDictionary>
     </Control.Resources>
@@ -144,18 +199,29 @@
             <Separator />
             <controls:ImageButton x:Name="btnAttach" Text="Attach" Image="/DebugAttachHistory;component/Resources/attach.png" Click="BtnAttachClick" />
         </StackPanel>
-        <StackPanel Grid.Row="1" Name="panTop" Orientation="Vertical">
-            <controls:SearchControl x:Name="txtFilter"  TextChanged="TxtFilterTextChanged" Height="26"
+		<StackPanel Grid.Row="1" Name="panTop" Orientation="Vertical">
+			<controls:SearchControl x:Name="txtFilter"  TextChanged="Search" Height="26"
 				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
 				BorderBrush="{DynamicResource {x:Static ux:Colors.SearchBorder}}"
 				Background="{DynamicResource {x:Static ux:Colors.SearchBackground}}"
 				HintColor="{DynamicResource {x:Static ux:Colors.SearchPlaceHolderForeground}}" 
 				HintText="Search Processes"/>
-        </StackPanel>
-        <ListBox Grid.Row="2" Name="lstSearchProcesses" MinHeight="60" ItemTemplate="{StaticResource ProcessTemplate}" 
-			Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
-			Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"
-			MouseDoubleClick="LstSearchProcessesMouseDoubleClick" Padding="5,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+		</StackPanel>
+
+        <DataGrid Grid.Row="2" Name="lstSearchProcesses" MinHeight="60" AutoGenerateColumns="False" SelectionMode="Extended" CanUserResizeColumns="True" CanUserSortColumns="True"
+				Background="{DynamicResource {x:Static ux:Colors.MainBackground}}"
+                RowBackground="{DynamicResource {x:Static ux:Colors.MainBackground}}"
+				Foreground="{DynamicResource {x:Static ux:Colors.MainForeground}}"                                
+				GridLinesVisibility="None"
+				HeadersVisibility="Column"
+				IsReadOnly="True"                
+				MouseDoubleClick="LstSearchProcessesMouseDoubleClick"                
+				ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Name" CellTemplate="{StaticResource ProcessTemplate}" Width="100*"></DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
 		<GridSplitter Grid.Row="3" Height="3" HorizontalAlignment="Stretch" />
 		<Grid Grid.Row="4">
 			<Grid.RowDefinitions>
