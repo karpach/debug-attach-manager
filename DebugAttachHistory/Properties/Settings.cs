@@ -9,6 +9,7 @@ namespace Karpach.DebugAttachManager.Properties
     internal sealed class Settings
     {
         private Dictionary<int,StoredProcessInfo> _processes;
+        private bool[] _processesColumns;
         private readonly WritableSettingsStore _settingsStore;
 
         public Settings(IServiceProvider provider)
@@ -42,13 +43,28 @@ namespace Karpach.DebugAttachManager.Properties
             {
                 RemoteServer = _settingsStore.GetString("DebugAttachManagerProcesses", "RemoteServer");
             }
+
+            for (int i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
+            {
+                string columnName = $"Column{i}";
+                if (_settingsStore.PropertyExists("DebugAttachManagerProcesses", columnName))
+                {
+                    ProcessesColumns[i] = _settingsStore.GetBoolean("DebugAttachManagerProcesses", columnName);
+                }
+                else
+                {
+                    if (i == 0)
+                    {
+                        // This is a hack, so we display PID by default
+                        ProcessesColumns[i] = true;
+                    }
+                }
+            }            
         }
 
-        public Dictionary<int,StoredProcessInfo> Processes
-        {
-            get => _processes ?? (_processes = new Dictionary<int, StoredProcessInfo>());
-            set => _processes = value;
-        }
+        public Dictionary<int,StoredProcessInfo> Processes => _processes ?? (_processes = new Dictionary<int, StoredProcessInfo>());
+
+        public bool[] ProcessesColumns => _processesColumns ?? (_processesColumns = new bool[Constants.NUMBER_OF_OPTIONAL_COLUMNS] );
 
         public string RemoteServer { get; set; }
        
@@ -93,7 +109,12 @@ namespace Karpach.DebugAttachManager.Properties
                     _settingsStore.CreateCollection("DebugAttachManagerProcesses");
                 }
                 _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteServer", RemoteServer);
-            }            
+            }
+            for (i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
+            {
+                string columnName = $"Column{i}";
+                _settingsStore.SetBoolean("DebugAttachManagerProcesses", columnName, _processesColumns[i]);
+            }
         }
-    }
+    }    
 }

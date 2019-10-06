@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Windows.Data;
 using System.Windows.Media;
 using EnvDTE80;
 using Karpach.DebugAttachManager.Models;
@@ -34,11 +35,12 @@ namespace Karpach.DebugAttachManager
         {
             InitializeComponent();            
             _processes = GetProcesses(_remoteServer, _remoteServerPort).ToList();
-            _debugModes = new Lazy<KeyValuePair<string, string>[]>(() => GetDebugModes().ToArray());            
+            _debugModes = new Lazy<KeyValuePair<string, string>[]>(() => GetDebugModes().ToArray());
+            InitializeColumns();
             lstSearchProcesses.ItemsSource = _processes;                        
         }
 
-        #endregion
+        #endregion        
 
         #region Public Methods
 
@@ -101,12 +103,16 @@ namespace Karpach.DebugAttachManager
             FilterRefresh();                       
         }               
 
-        private void TxtFilterTextChanged(object sender, TextChangedEventArgs e)
+        private void Search(object sender, TextChangedEventArgs e)
         {
+            bool searchPid = Settings.Default.ProcessesColumns[0];
+            bool searchCommandLine = Settings.Default.ProcessesColumns[1];
             lstSearchProcesses.ItemsSource =
                 _processes.Where(
                     p => p.ProcessName.ToLower().Contains(txtFilter.Text.ToLower()) 
-                         || p.Title != null && p.Title.ToLower().Contains(txtFilter.Text.ToLower()));
+						|| searchPid && p.ProcessId.HasValue && string.Equals(p.ProcessId.Value.ToString(),txtFilter.Text, StringComparison.InvariantCultureIgnoreCase)
+                         || searchCommandLine && p.CommandLine.ToLower().Contains(txtFilter.Text.ToLower())
+                         || p.Title != null && p.Title.StartsWith(ProcessExt.TitlePrefix) && p.Title.ToLower().Contains(txtFilter.Text.ToLower()));
         }
 
         private void BtnAttachClick(object sender, RoutedEventArgs e)
@@ -290,7 +296,7 @@ namespace Karpach.DebugAttachManager
                 }
                 else
                 {
-                    TxtFilterTextChanged(null, null);
+                    Search(null, null);
                 }                
             }
             Filter.Tag = FilterIIS || FilterDevIIS;
@@ -308,6 +314,16 @@ namespace Karpach.DebugAttachManager
                 FilterIIS = false;
                 FilterDevIIS = false;
                 FilterRefresh();
+            }            
+        }
+
+        private void LstSearchProcessesHeaderClick(Object sender, RoutedEventArgs e)
+        {
+            var dlg = new SelectedColumns();
+            dlg.ShowDialog();
+            if (dlg.DialogResult ?? false)
+            {
+                InitializeColumns();
             }            
         }
 
@@ -384,6 +400,33 @@ namespace Karpach.DebugAttachManager
             Transport trans = db.Transports.Item("Default");
             
             return db.GetProcesses(trans, remoteServerPort == null ? remoteServer : $"{remoteServer}:{remoteServerPort}");
+        }
+
+        private void InitializeColumns()
+        {
+            while (lstSearchProcesses.Columns.Count > 1)
+            {
+                lstSearchProcesses.Columns.RemoveAt(lstSearchProcesses.Columns.Count - 1);
+            }
+            if (Settings.Default.ProcessesColumns[0])
+            {
+                lstSearchProcesses.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "PID",
+                    Binding = new Binding("ProcessId"),
+                    Width = new DataGridLength(30, DataGridLengthUnitType.Star)
+                });
+            }
+
+            if (Settings.Default.ProcessesColumns[1])
+            {
+                lstSearchProcesses.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Command Line",
+                    Binding = new Binding("CommandLine"),
+                    Width = new DataGridLength(60, DataGridLengthUnitType.Star)
+                });
+            }
         }
 
         #endregion

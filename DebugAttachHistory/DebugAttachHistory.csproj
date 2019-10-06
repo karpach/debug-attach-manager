@@ -171,6 +171,7 @@
     <Compile Include="ConnectWindow.xaml.cs">
       <DependentUpon>ConnectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Constants.cs" />
     <Compile Include="Controls\SplitButton.cs" />
     <Compile Include="DebugOptions.xaml.cs">
       <DependentUpon>DebugOptions.xaml</DependentUpon>
@@ -202,6 +203,9 @@
     <Compile Include="Controls\ToggleImageButton.xaml.cs">
       <DependentUpon>ToggleImageButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SelectedColumns.xaml.cs">
+      <DependentUpon>SelectedColumns.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -227,6 +231,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SelectedColumns.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Resource Include="Resources\attach.png" />
     <Resource Include="Resources\bug.ico" />
     <Resource Include="Resources\iis.png" />
@@ -249,6 +257,9 @@
     </Content>
     <Content Include="..\LICENSE">
       <Link>Resources\LICENSE</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Ms-PL.rtf">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="packages.config" />

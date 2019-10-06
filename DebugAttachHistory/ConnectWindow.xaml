@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
         xmlns:local="clr-namespace:Karpach.DebugAttachManager"        
-        mc:Ignorable="d"
-        Background="#FFF0F0F0"
-        Foreground="#FFFFFFFF"
+        mc:Ignorable="d"        
         ResizeMode="NoResize"
+        WindowStyle="ToolWindow"        
         Title="Remote Connect" Height="180" Width="300">
     <Window.Resources>
         <ResourceDictionary>
