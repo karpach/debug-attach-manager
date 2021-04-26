@@ -85,6 +85,14 @@ namespace Karpach.DebugAttachManager
 
             DialogResult = true;
             Settings.Default.RemoteServer = txtServerName.Text;
+            if (string.IsNullOrEmpty(txtPortNumber.Text))
+            {
+                Settings.Default.RemotePort = txtPortNumber.Text;
+            }
+            if (string.IsNullOrEmpty(txtPortNumber.Text))
+            {
+                Settings.Default.RemoteUserName = txtUserName.Text;
+            }
             Settings.Default.Save();
             Close();
         }        

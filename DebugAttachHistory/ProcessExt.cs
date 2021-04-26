@@ -11,12 +11,12 @@ namespace Karpach.DebugAttachManager
         private static readonly MemoryCache Cache = MemoryCache.Default;
         public const string TitlePrefix = "~|~";        
 
-        public ProcessExt(string processName, int processId, string serverName, long? portNumber)
+        public ProcessExt(string processName, int processId, string serverName, long? portNumber, string userName, string password)
         {
             if (processName.Contains("\\"))
             {
                 ProcessName = processName.Substring(processName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-                Title = GetTitle(ProcessName, processId, serverName);
+                Title = GetTitle(ProcessName, processId, serverName, userName, password);
                 if (string.IsNullOrEmpty(Title))
                 {
                     Title = processName;
@@ -25,12 +25,14 @@ namespace Karpach.DebugAttachManager
             else
             {
                 ProcessName = processName;
-                Title = GetTitle(processName, processId, serverName);
+                Title = GetTitle(processName, processId, serverName, userName, password);
             }
             ServerName = serverName;
             PortNumber = portNumber;
 			ProcessId = processId;
-		}
+            UserName = userName;
+            Password = password;
+        }
 
 
         public ProcessExt(string processName, string title, string serverName, long? portNumber)
@@ -49,7 +51,11 @@ namespace Karpach.DebugAttachManager
 
         public long? PortNumber { get; set; }
 
-		public string CommandLine
+        public string UserName { get; set; }
+
+        public string Password { get; set; }
+
+        public string CommandLine
 		{
 			get
 			{
@@ -69,7 +75,7 @@ namespace Karpach.DebugAttachManager
 
         public int Hash => string.Concat(ProcessName, Title, ServerName, PortNumber).GetHashCode();
 
-        private static IEnumerable<WmiProcess> GetWmiProcesses(string serverName = null)
+        private static IEnumerable<WmiProcess> GetWmiProcesses(string serverName, string userName, string password)
         {
             string key = serverName ?? "localhost";
             if (Cache.Contains(key))
@@ -81,12 +87,27 @@ namespace Karpach.DebugAttachManager
 
             if (serverName != null)
             {
-                ConnectionOptions options = new ConnectionOptions
+                ConnectionOptions options;
+                if (string.IsNullOrEmpty(userName) && string.IsNullOrEmpty(password))
                 {
-                    Impersonation = ImpersonationLevel.Impersonate,
-                    EnablePrivileges = true,
-                    Authentication = AuthenticationLevel.PacketPrivacy
-                };
+                    options = new ConnectionOptions
+                    {
+                        Impersonation = ImpersonationLevel.Impersonate,
+                        EnablePrivileges = true,
+                        Authentication = AuthenticationLevel.PacketPrivacy
+                    };
+                }
+                else
+                {
+                    options = new ConnectionOptions
+                    {
+                        Impersonation = ImpersonationLevel.Identify,
+                        EnablePrivileges = true,
+                        Username = userName,
+                        Password = password,
+                        Authentication = AuthenticationLevel.PacketPrivacy
+                    };
+                }
 
                 scope = new ManagementScope($"\\\\{serverName}\\root\\cimv2", options);
                 try
@@ -127,13 +148,13 @@ namespace Karpach.DebugAttachManager
             return result;
         }        
 
-        private static string GetTitle(string processName, int processId, string serverName = null)
+        private static string GetTitle(string processName, int processId, string serverName, string userName, string password)
         {            
             if (string.IsNullOrEmpty(processName))
             {
                 return string.Empty;
             }
-            WmiProcess process = GetWmiProcesses(serverName).FirstOrDefault(p => p.ProcessId == processId);
+            WmiProcess process = GetWmiProcesses(serverName, userName, password).FirstOrDefault(p => p.ProcessId == processId);
             if (process == null)
             {
                 return String.Empty;
