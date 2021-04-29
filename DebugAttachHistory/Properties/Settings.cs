@@ -44,6 +44,16 @@ namespace Karpach.DebugAttachManager.Properties
                 RemoteServer = _settingsStore.GetString("DebugAttachManagerProcesses", "RemoteServer");
             }
 
+            if (_settingsStore.PropertyExists("DebugAttachManagerProcesses", "RemotePort"))
+            {
+                RemotePort = _settingsStore.GetString("DebugAttachManagerProcesses", "RemotePort");
+            }
+
+            if (_settingsStore.PropertyExists("DebugAttachManagerProcesses", "RemoteUserName"))
+            {
+                RemoteUserName = _settingsStore.GetString("DebugAttachManagerProcesses", "RemoteUserName");
+            }
+
             for (int i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
             {
                 string columnName = $"Column{i}";
@@ -67,7 +77,11 @@ namespace Karpach.DebugAttachManager.Properties
         public bool[] ProcessesColumns => _processesColumns ?? (_processesColumns = new bool[Constants.NUMBER_OF_OPTIONAL_COLUMNS] );
 
         public string RemoteServer { get; set; }
-       
+
+        public string RemotePort { get; set; }
+
+        public string RemoteUserName { get; set; }
+
         private static Settings _default;
         public static Settings Default => _default ?? (_default = new Settings(DebugAttachManagerPackage.ServiceProvider));
 
@@ -109,6 +123,22 @@ namespace Karpach.DebugAttachManager.Properties
                     _settingsStore.CreateCollection("DebugAttachManagerProcesses");
                 }
                 _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteServer", RemoteServer);
+            }
+            if (!string.IsNullOrEmpty(RemotePort))
+            {
+                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
+                {
+                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
+                }
+                _settingsStore.SetString("DebugAttachManagerProcesses", "RemotePort", RemotePort);
+            }
+            if (!string.IsNullOrEmpty(RemoteUserName))
+            {
+                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
+                {
+                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
+                }
+                _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteUserName", RemoteUserName);
             }
             for (i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
             {

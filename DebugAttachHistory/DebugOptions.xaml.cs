@@ -34,7 +34,7 @@ namespace Karpach.DebugAttachManager
         public DebugOptionsControl()
         {
             InitializeComponent();            
-            _processes = GetProcesses(_remoteServer, _remoteServerPort).ToList();
+            _processes = GetProcesses(_remoteServer, _remoteServerPort, _remoteUserName, _remotePassword, _useWmi).ToList();
             _debugModes = new Lazy<KeyValuePair<string, string>[]>(() => GetDebugModes().ToArray());
             InitializeColumns();
             lstSearchProcesses.ItemsSource = _processes;                        
@@ -83,6 +83,9 @@ namespace Karpach.DebugAttachManager
             {
                 _remoteServer = dlg.ServerName;
                 _remoteServerPort = dlg.PortNumber;
+                _remoteUserName = dlg.UserName;
+                _remotePassword = dlg.Password;
+                _useWmi = dlg.SuccessWmiConnection;
                 FilterRefresh();
             }
             else
@@ -140,7 +143,10 @@ namespace Karpach.DebugAttachManager
                 .GroupBy(p => new
                 {
                     p.Process.ServerName,
-                    p.Process.PortNumber
+                    p.Process.PortNumber,
+                    p.Process.UserName,
+                    p.Process.Password,
+                    p.Process.UseWmi
                 })
                 .ToDictionary(x=>x.Key, x=>x.ToList());
             foreach (var key in selectedProcesses.Keys)
@@ -150,7 +156,7 @@ namespace Karpach.DebugAttachManager
                 
                 foreach (Process2 process in processes)
                 {
-                    ProcessExt pp = new ProcessExt(process.Name, process.ProcessID, key.ServerName, key.PortNumber);                    
+                    ProcessExt pp = new ProcessExt(process.Name, process.ProcessID, key.ServerName, key.PortNumber, key.UserName, key.Password, key.UseWmi);                    
                     var selectedProcess = selectedProcesses[key].FirstOrDefault(p => pp.Hash == p.Process.Hash);
                     if (!string.IsNullOrEmpty(selectedProcess?.DebugMode))
                     {
@@ -269,7 +275,7 @@ namespace Karpach.DebugAttachManager
             {                
                 FilterTwo.Background = Brushes.Transparent;
                 FilterOne.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
-                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress.exe")).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort, _remoteUserName, _remotePassword, _useWmi).Where(p => p.ProcessName.Contains("WebDev") || string.Equals(p.ProcessName, "iisexpress.exe")).ToList();
                 lstSearchProcesses.ItemsSource = _processes;
             }
             else
@@ -280,7 +286,7 @@ namespace Karpach.DebugAttachManager
             {                
                 FilterOne.Background = Brushes.Transparent;
                 FilterTwo.SetResourceReference(MenuItem.BackgroundProperty, Colors.ToolbarHoverBackground);
-                _processes = GetProcesses(_remoteServer, _remoteServerPort).Where(p => p.ProcessName.Contains("w3wp")).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort, _remoteUserName, _remotePassword, _useWmi).Where(p => p.ProcessName.Contains("w3wp")).ToList();
                 lstSearchProcesses.ItemsSource = _processes;
             }
             else
@@ -289,7 +295,7 @@ namespace Karpach.DebugAttachManager
             }
             if (!FilterIIS && !FilterDevIIS)
             {
-                _processes = GetProcesses(_remoteServer, _remoteServerPort).ToList();
+                _processes = GetProcesses(_remoteServer, _remoteServerPort, _remoteUserName, _remotePassword, _useWmi).ToList();
                 if (string.IsNullOrEmpty(txtFilter.Text))
                 {                    
                     lstSearchProcesses.ItemsSource = _processes;
@@ -367,24 +373,24 @@ namespace Karpach.DebugAttachManager
             }
         }
 
-        private static IEnumerable<ProcessExt> GetProcesses(string remoteServer, long? remoteServerPort)
+        private static IEnumerable<ProcessExt> GetProcesses(string remoteServer, long? remoteServerPort, string remoteUserName, string remotePassword, bool useWmi)
         {
             var result = new List<ProcessExt>();
             if (string.IsNullOrEmpty(remoteServer))
             {                
                 foreach (EnvDTE.Process p in ((Debugger2)DebugAttachManagerPackage.DTE.Debugger).LocalProcesses)
                 {
-                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort));
+                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort, remoteUserName, remotePassword, useWmi));
                 }
             }
             else
             {
                 Debugger2 db = (Debugger2)DebugAttachManagerPackage.DTE.Debugger;
                 Transport trans = db.Transports.Item("Default");
-                
+
                 foreach (EnvDTE.Process p in db.GetProcesses(trans, remoteServerPort == null ? remoteServer : $"{remoteServer}:{remoteServerPort}"))
                 {
-                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort));
+                    result.Add(new ProcessExt(p.Name, p.ProcessID, remoteServer, remoteServerPort, remoteUserName, remotePassword, useWmi));
                 }
             }            
             return result;
@@ -439,7 +445,10 @@ namespace Karpach.DebugAttachManager
         protected bool FilterIIS;
         private string _remoteServer = null;
         private int? _remoteServerPort = null;
+        private string _remoteUserName = null;
+        private string _remotePassword = null;
+        private bool _useWmi = true;
 
-        #endregion        
+        #endregion
     }
 }
