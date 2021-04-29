@@ -22,20 +22,22 @@
                                                 UpdateSourceTrigger=PropertyChanged}"
                                          x:Name="textSource" 
                                          Background="Transparent" 
-                                         VerticalAlignment="Center"
                                          Height="26"
+                                         VerticalContentAlignment="Center"
+                                         Padding="5 0 0 0"
                                          Panel.ZIndex="2" />
                                 <TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1">
                                     <TextBox.Style>
                                         <Style TargetType="{x:Type TextBox}">
-                                            <Setter Property="Foreground" Value="Transparent"/>
-                                            <Style.Triggers>
+	                                        <Setter Property="Foreground" Value="Transparent"/>
+	                                        <Setter Property="Height" Value="26"/>
+	                                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+	                                        <Setter Property="Padding" Value="5 0 0 0"/>
+											<Style.Triggers>
                                                 <DataTrigger Binding="{Binding Path=Text, Source={x:Reference textSource}}" Value="">
                                                     <Setter Property="Foreground" Value="LightGray"/>
-                                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                                    <Setter Property="Padding" Value="5 0 0 0"/>
                                                 </DataTrigger>
-                                            </Style.Triggers>
+	                                        </Style.Triggers>
                                         </Style>
                                     </TextBox.Style>
                                 </TextBox>
@@ -62,13 +64,13 @@
         <Label Grid.Column="0" Grid.Row="1" Content="Port:" Height="26"/>
         <Label Grid.Column="0" Grid.Row="2" Content="User name:" Height="26"/>
         <Label Grid.Column="0" Grid.Row="3" Content="Password:" Height="26"/>
-        <TextBox x:Name="txtServerName" Grid.Column="1" Grid.Row="0" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center"/>
-        <TextBox Style="{StaticResource placeHolder}" x:Name="txtPortNumber" Grid.Column="1" Grid.Row="1" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center" Tag="Auto"/>
-        <TextBox Style="{StaticResource placeHolder}" x:Name="txtUserName" Grid.Column="1" Grid.Row="2" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center" Tag="Optional"/>
-        <TextBox Style="{StaticResource placeHolder}" x:Name="txtPassword" Grid.Column="1" Grid.Row="3" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center" Tag="Optional"/>
+        <TextBox Name="txtServerName" Grid.Column="1" Grid.Row="0" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center"/>
+		<TextBox Name="txtPortNumber" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="1" Tag="Auto"/>
+		<TextBox Name="txtUserName" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="2" Tag="Optional"/>
+		<TextBox Name="txtPassword" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="3" Tag="Optional"/>
         <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Connect" Width="60" Height="28" Margin="0 0 5 0" IsDefault="True" Click="ConnectOnClick" />
-            <Button Content="Cancel" Width="60" Height="28" Margin="5 0 0 0" IsCancel="True"/>
+            <Button Name="ConnectButton" Content="Connect" Width="60" Height="28" Margin="0 0 5 0" IsDefault="True" Click="ConnectOnClick" />
+            <Button Name="CancelButton" Content="Cancel" Width="60" Height="28" Margin="5 0 0 0" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

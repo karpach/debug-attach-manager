@@ -1,17 +1,21 @@
-﻿using System;
-using System.Management;
+﻿using System.Management;
 using System.Windows;
+using EnvDTE;
 using EnvDTE80;
-using Karpach.DebugAttachManager.Properties;
+using Karpach.DebugAttachManager.Helpers;
 
 namespace Karpach.DebugAttachManager
 {
     /// <summary>
     /// Interaction logic for ConnectWindow.xaml
     /// </summary>
-    public partial class ConnectWindow : Window
+    public partial class ConnectWindow : System.Windows.Window
     {
-        public string ServerName => txtServerName.Text;
+	    private readonly ISettingsProvider _settingsProvider;
+	    public string ServerName => txtServerName.Text;
+	    public string UserName => txtUserName.Text;
+	    public string Password => txtPassword.Text;
+	    public bool SuccessWmiConnection { get; protected set; }
 
         private int _portNumber;        
 
@@ -31,10 +35,17 @@ namespace Karpach.DebugAttachManager
             }            
         }
 
-        public ConnectWindow()
+        public ConnectWindow(): this(new SettingsProvider())
         {
-            InitializeComponent();
-            txtServerName.Text = Settings.Default.RemoteServer;
+        }
+
+        public ConnectWindow(ISettingsProvider settingsProvider)
+        {
+	        _settingsProvider = settingsProvider;
+	        InitializeComponent();
+	        txtServerName.Text = _settingsProvider.RemoteServer;
+	        txtPortNumber.Text = _settingsProvider.RemotePort;
+	        txtUserName.Text = _settingsProvider.RemoteUserName;
         }
 
         private void ConnectOnClick(object sender, RoutedEventArgs e)
@@ -62,14 +73,30 @@ namespace Karpach.DebugAttachManager
                 return;
             }
 
-            ConnectionOptions options = new ConnectionOptions
+            ConnectionOptions options;
+            if (string.IsNullOrEmpty(txtUserName.Text) && string.IsNullOrEmpty(txtPassword.Text))
             {
-                Impersonation = ImpersonationLevel.Default,
-                EnablePrivileges = true,
-                Authentication = AuthenticationLevel.PacketPrivacy                
-            };            
+	            options = new ConnectionOptions
+	            {
+		            Impersonation = ImpersonationLevel.Default,
+		            EnablePrivileges = true,
+		            Authentication = AuthenticationLevel.PacketPrivacy
+	            };
+            }
+            else
+            {
+	            options = new ConnectionOptions
+	            {
+		            Impersonation = ImpersonationLevel.Identify,
+		            EnablePrivileges = true,
+		            Authentication = AuthenticationLevel.PacketPrivacy,
+		            Username = txtUserName.Text,
+		            Password = txtPassword.Text
+	            };
+            }
 
             var scope = new ManagementScope($@"\\{txtServerName.Text}\root\cimv2", options);
+            SuccessWmiConnection = true;
             try
             {
                 scope.Connect();
@@ -81,19 +108,29 @@ namespace Karpach.DebugAttachManager
                 {
                     return;
                 }
+                SuccessWmiConnection = false;
             }
 
             DialogResult = true;
-            Settings.Default.RemoteServer = txtServerName.Text;
+            _settingsProvider.RemoteServer = txtServerName.Text;
             if (string.IsNullOrEmpty(txtPortNumber.Text))
             {
-                Settings.Default.RemotePort = txtPortNumber.Text;
+	            _settingsProvider.RemotePort = txtPortNumber.Text;
             }
-            if (string.IsNullOrEmpty(txtPortNumber.Text))
+
+            if (SuccessWmiConnection)
             {
-                Settings.Default.RemoteUserName = txtUserName.Text;
+	            if (string.IsNullOrEmpty(txtUserName.Text))
+	            {
+		            _settingsProvider.RemoteUserName = txtUserName.Text;
+	            }
             }
-            Settings.Default.Save();
+            else
+            {
+	            txtUserName.Text = string.Empty;
+	            txtPassword.Text = string.Empty;
+            }
+            _settingsProvider.Save();
             Close();
         }        
     }

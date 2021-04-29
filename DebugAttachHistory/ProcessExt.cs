@@ -11,12 +11,13 @@ namespace Karpach.DebugAttachManager
         private static readonly MemoryCache Cache = MemoryCache.Default;
         public const string TitlePrefix = "~|~";        
 
-        public ProcessExt(string processName, int processId, string serverName, long? portNumber, string userName, string password)
+        public ProcessExt(string processName, int processId, string serverName, long? portNumber, string userName, string password, bool useWmi)
         {
+	        UseWmi = useWmi;
             if (processName.Contains("\\"))
             {
                 ProcessName = processName.Substring(processName.LastIndexOf("\\", StringComparison.Ordinal) + 1);
-                Title = GetTitle(ProcessName, processId, serverName, userName, password);
+                Title = GetTitle(ProcessName, processId, serverName, userName, password, useWmi);
                 if (string.IsNullOrEmpty(Title))
                 {
                     Title = processName;
@@ -25,7 +26,7 @@ namespace Karpach.DebugAttachManager
             else
             {
                 ProcessName = processName;
-                Title = GetTitle(processName, processId, serverName, userName, password);
+                Title = GetTitle(processName, processId, serverName, userName, password, useWmi);
             }
             ServerName = serverName;
             PortNumber = portNumber;
@@ -54,6 +55,8 @@ namespace Karpach.DebugAttachManager
         public string UserName { get; set; }
 
         public string Password { get; set; }
+        
+        public bool UseWmi { get; private set; }
 
         public string CommandLine
 		{
@@ -116,8 +119,11 @@ namespace Karpach.DebugAttachManager
                 }
                 catch
                 {
-                    Cache[key] = null;
-                    return null;
+	                if (Cache.Contains(key))
+	                {
+		                Cache[key] = null;
+                    }
+	                return null;
                 }
             }
 
@@ -148,13 +154,13 @@ namespace Karpach.DebugAttachManager
             return result;
         }        
 
-        private static string GetTitle(string processName, int processId, string serverName, string userName, string password)
+        private static string GetTitle(string processName, int processId, string serverName, string userName, string password, bool useWmi)
         {            
-            if (string.IsNullOrEmpty(processName))
+            if (string.IsNullOrEmpty(processName) || !useWmi)
             {
                 return string.Empty;
             }
-            WmiProcess process = GetWmiProcesses(serverName, userName, password).FirstOrDefault(p => p.ProcessId == processId);
+            WmiProcess process = GetWmiProcesses(serverName, userName, password)?.FirstOrDefault(p => p.ProcessId == processId);
             if (process == null)
             {
                 return String.Empty;

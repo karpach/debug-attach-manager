@@ -138,7 +138,7 @@ namespace Karpach.DebugAttachManager.Properties
                 {
                     _settingsStore.CreateCollection("DebugAttachManagerProcesses");
                 }
-                _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteUserName", RemoteServer);
+                _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteUserName", RemoteUserName);
             }
             for (i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
             {

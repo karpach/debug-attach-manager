@@ -179,6 +179,8 @@
     <Compile Include="DebugOptionsWindow.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Helpers\BooleanBoxes.cs" />
+    <Compile Include="Helpers\ISettingsProvider.cs" />
+    <Compile Include="Helpers\SettingsProvider.cs" />
     <Compile Include="Helpers\ValueConverters.cs" />
     <Compile Include="IISExpressRunner.cs" />
     <Compile Include="Controls\ImageButton.xaml.cs">
