@@ -48,6 +48,6 @@ The extension also supports basic remote debugging:
 
 ![Screenshot7](Screenshots/screenshot7.png)
 
-The logged-in user needs to have access to the remote PC. 
+The logged-in user needs to have access to the remote PC. Optionally you can specify user name and password. 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/9mw67f51ocxiychg?svg=true)](https://ci.appveyor.com/project/karpach/debug-attach-manager)
