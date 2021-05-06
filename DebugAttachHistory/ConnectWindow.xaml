@@ -26,7 +26,7 @@
                                          VerticalContentAlignment="Center"
                                          Padding="5 0 0 0"
                                          Panel.ZIndex="2" />
-                                <TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1">
+                                <TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1" FontFamily="Mono">
                                     <TextBox.Style>
                                         <Style TargetType="{x:Type TextBox}">
 	                                        <Setter Property="Foreground" Value="Transparent"/>
@@ -46,7 +46,44 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-        </ResourceDictionary>
+			<Style x:Key="passwordPlaceHolder" TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="{x:Type TextBox}">
+							<Grid>
+								<TextBox Text="{Binding Path=Text,
+                                                RelativeSource={RelativeSource TemplatedParent}, 
+                                                Mode=TwoWay,
+                                                UpdateSourceTrigger=PropertyChanged}"
+								         x:Name="passwordTextSource" 
+								         Background="Transparent" 
+								         Height="26"
+								         VerticalContentAlignment="Center"
+								         FontFamily="/DebugAttachHistory;component/Resources/#Password"
+								         Padding="5 0 0 0"
+								         Panel.ZIndex="2" />
+								<TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1">
+									<TextBox.Style>
+										<Style TargetType="{x:Type TextBox}">
+											<Setter Property="Foreground" Value="Transparent"/>
+											<Setter Property="Height" Value="26"/>
+											<Setter Property="VerticalContentAlignment" Value="Center"/>
+											<Setter Property="Padding" Value="5 0 0 0"/>
+											<Setter Property="FontFamily" Value="Mono"/>
+											<Style.Triggers>
+												<DataTrigger Binding="{Binding Path=Text, Source={x:Reference passwordTextSource}}" Value="">
+													<Setter Property="Foreground" Value="LightGray"/>
+												</DataTrigger>
+											</Style.Triggers>
+										</Style>
+									</TextBox.Style>
+								</TextBox>
+							</Grid>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+		</ResourceDictionary>
     </Window.Resources>
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
@@ -67,8 +104,8 @@
         <TextBox Name="txtServerName" Grid.Column="1" Grid.Row="0" Height="26" Padding="5 0 0 0" VerticalContentAlignment="Center"/>
 		<TextBox Name="txtPortNumber" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="1" Tag="Auto"/>
 		<TextBox Name="txtUserName" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="2" Tag="Optional"/>
-		<TextBox Name="txtPassword" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="3" Tag="Optional"/>
-        <StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+		<TextBox Name="txtPassword" Style="{StaticResource placeHolder}" Grid.Column="1" Grid.Row="3" Tag="Optional" FontFamily="/DebugAttachHistory;component/Resources/#Password"/>
+		<StackPanel Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Name="ConnectButton" Content="Connect" Width="60" Height="28" Margin="0 0 5 0" IsDefault="True" Click="ConnectOnClick" />
             <Button Name="CancelButton" Content="Cancel" Width="60" Height="28" Margin="5 0 0 0" IsCancel="True"/>
         </StackPanel>

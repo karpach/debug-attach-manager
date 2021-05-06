@@ -265,6 +265,8 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="packages.config" />
+    <None Include="Resources\Images_32bit.pdn" />
+    <Resource Include="Resources\password.ttf" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
