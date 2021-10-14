@@ -116,29 +116,21 @@ namespace Karpach.DebugAttachManager.Properties
                 }                
                 i++;
             }
+            if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
+            {
+	            _settingsStore.CreateCollection("DebugAttachManagerProcesses");
+            }
             if (!string.IsNullOrEmpty(RemoteServer))
             {
-                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
-                {
-                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
-                }
-                _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteServer", RemoteServer);
+	            _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteServer", RemoteServer);
             }
             if (!string.IsNullOrEmpty(RemotePort))
             {
-                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
-                {
-                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
-                }
-                _settingsStore.SetString("DebugAttachManagerProcesses", "RemotePort", RemotePort);
+	            _settingsStore.SetString("DebugAttachManagerProcesses", "RemotePort", RemotePort);
             }
             if (!string.IsNullOrEmpty(RemoteUserName))
             {
-                if (!_settingsStore.CollectionExists("DebugAttachManagerProcesses"))
-                {
-                    _settingsStore.CreateCollection("DebugAttachManagerProcesses");
-                }
-                _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteUserName", RemoteUserName);
+	            _settingsStore.SetString("DebugAttachManagerProcesses", "RemoteUserName", RemoteUserName);
             }
             for (i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
             {

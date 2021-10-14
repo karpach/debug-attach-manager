@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Karpach.DebugAttachManager.Properties;
+using Microsoft.VisualStudio.OLE.Interop;
+using Serilog;
 
 namespace Karpach.DebugAttachManager
 {
@@ -39,14 +42,24 @@ namespace Karpach.DebugAttachManager
 
         private void Save(object sender, RoutedEventArgs e)
         {
-            SelectedColumn[] selectedColumns = (SelectedColumn[]) lstColumns.ItemsSource;
-            for (int i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
-            {
-                Settings.Default.ProcessesColumns[i] = selectedColumns[i].IsChecked;
+	        try
+	        {
+		        SelectedColumn[] selectedColumns = (SelectedColumn[])lstColumns.ItemsSource;
+		        for (int i = 0; i < Constants.NUMBER_OF_OPTIONAL_COLUMNS; i++)
+		        {
+			        Settings.Default.ProcessesColumns[i] = selectedColumns[i].IsChecked;
+		        }
+		        Settings.Default.Save();
+		        DialogResult = true;
+		        Log.Logger.Information("Columns were successfully changed.");
             }
-            Settings.Default.Save();
-            DialogResult = true;
-            Close();            
+	        catch (Exception exception)
+	        {
+		        string error = "Failed to update selected columns.";
+		        MessageBox.Show(error, "Internal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+		        Log.Logger.Fatal(exception, error);
+            }
+	        Close();            
         }
     }
 }

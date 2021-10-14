@@ -9,6 +9,7 @@ using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
+using Serilog;
 
 namespace Karpach.DebugAttachManager
 {
@@ -209,6 +210,10 @@ namespace Karpach.DebugAttachManager
             }
             DTE = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
             ServiceProvider = this;
+            Log.Logger = new LoggerConfiguration()
+	            .MinimumLevel.Information()
+	            .WriteTo.File("debug-attach-log-.txt", rollingInterval: RollingInterval.Day)
+	            .CreateLogger();
         }
         #endregion
 
