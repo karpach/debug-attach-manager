@@ -149,10 +149,11 @@ namespace Karpach.DebugAttachManager
                     p.Process.UseWmi
                 })
                 .ToDictionary(x=>x.Key, x=>x.ToList());
+
+            bool found = false;
             foreach (var key in selectedProcesses.Keys)
             {
                 EnvDTE.Processes processes = GetDebugProcesses(key.ServerName, key.PortNumber);
-                bool found = false;
                 
                 foreach (Process2 process in processes)
                 {
@@ -165,22 +166,31 @@ namespace Karpach.DebugAttachManager
                             if (string.Equals(engine.ID, selectedProcess.DebugMode))
                             {
                                 process.Attach2(new[] { engine });
+                                found = true;
+                                break;
                             }
                         }
-                        found = true;
                     }
                     else if (selectedProcess != null)
                     {
                         process.Attach();
                         found = true;
+                        break;
                     }
+
+                    if (found)
+                        break;
                 }
-                if (!found)
-                {
-                    MessageBox.Show("Selected processes are not running. Try to run your application first.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return false;
-                }                
+                if (found)
+                    break;
             }
+
+            if (!found)
+            {
+                MessageBox.Show("Selected processes are not running. Try to run your application first.", "Debug Attach History Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
             return true;
         }
 
