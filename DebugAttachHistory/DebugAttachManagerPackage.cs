@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -25,7 +26,7 @@ namespace Karpach.DebugAttachManager
     /// </summary>
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
+    [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
@@ -34,7 +35,7 @@ namespace Karpach.DebugAttachManager
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(DebugOptionsWindow))]
     [Guid(GuidList.guidDebugAttachManagerPkgString)]
-    public sealed class DebugAttachManagerPackage : Package
+    public sealed class DebugAttachManagerPackage : AsyncPackage
     {
         public static EnvDTE80.DTE2 DTE;
         public static IServiceProvider ServiceProvider;
@@ -186,15 +187,15 @@ namespace Karpach.DebugAttachManager
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initilaization code that rely on services provided by VisualStudio.
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async Task InitializeAsync(System.Threading.CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            base.Initialize();
+            await base.InitializeAsync(cancellationToken, progress);
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            OleMenuCommandService mcs = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
                 // Create the command for the tool window
@@ -208,12 +209,12 @@ namespace Karpach.DebugAttachManager
                 menuToolWin = new MenuCommand(SmartRun, toolwndCommandID);
                 mcs.AddCommand(menuToolWin);
             }
-            DTE = (EnvDTE80.DTE2)GetService(typeof(EnvDTE.DTE));
+            DTE = (EnvDTE80.DTE2)await GetServiceAsync(typeof(EnvDTE.DTE));
             ServiceProvider = this;
             Log.Logger = new LoggerConfiguration()
-	            .MinimumLevel.Information()
-	            .WriteTo.File("debug-attach-log-.txt", rollingInterval: RollingInterval.Day)
-	            .CreateLogger();
+                .MinimumLevel.Information()
+                .WriteTo.File("debug-attach-log-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
         }
         #endregion
 

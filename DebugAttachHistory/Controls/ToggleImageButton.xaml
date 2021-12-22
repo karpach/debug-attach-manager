@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ux="clr-namespace:Karpach.DebugAttachManager"
-             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"             
+             xmlns:Shell="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.15.0"             
              mc:Ignorable="d" 
              x:Name="root"
              d:DesignHeight="26" d:DesignWidth="100">    
