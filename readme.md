@@ -1,6 +1,6 @@
 ﻿# Debug Attach Manager
 
-Download the extension at the  [VS Gallery](https://marketplace.visualstudio.com/items?itemName=ViktarKarpach.DebugAttachManager) or get the [nightly build](http://vsixgallery.com/extension/facf6f74-1cc6-44be-b57d-115d48b30021/).
+Download the extension at the  [VS Gallery](https://marketplace.visualstudio.com/items?itemName=ViktarKarpach.DebugAttachManager2022) or get the [nightly build](http://vsixgallery.com/extension/facf6f74-1cc6-44be-b57d-115d48b30021/).
 
 This extension gives you the ability to search for processes and then attach to them. It automatically saves selected processes between Visual Studio restarts. You can easily find IIS application pool specific processes and attach to them. The extension has the attach shortcut key, by default, it is Ctrl+Shift+Alt+F5. You can attach to multiple processes at once. If you are a web developer, then you must have it.
 
