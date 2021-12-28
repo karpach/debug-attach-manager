@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
 		<Metadata>
-				<Identity Id="FA1028B5-FB96-4C67-BDE0-F4EA17CF9EE4" Version="2.4.211221.0" Language="en-US" Publisher="Viktar Karpach" />
+				<Identity Id="FA1028B5-FB96-4C67-BDE0-F4EA17CF9EE4" Version="2.4.211228.0" Language="en-US" Publisher="Viktar Karpach" />
 				<DisplayName>Debug Attach Manager</DisplayName>
 				<Description xml:space="preserve">Extension provides extended abilities to attach Visual Studio debuger to web application pools, windows services and other processes.</Description>
 				<MoreInfo>http://www.karpach.com</MoreInfo>
