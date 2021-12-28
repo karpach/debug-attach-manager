@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json.schemastore.org/vsix-publish",
+    "categories": [ "tools", "testing", "web" ],
+    "identity": {
+        "internalName": "DebugAttachManager2022"
+    },
+    "overview": "overview.md",
+    "priceCategory": "free",
+    "publisher": "ViktarKarpach",
+    "private": false,
+    "qna": true,
+    "repo": "https://github.com/karpach/debug-attach-manager"
+}
