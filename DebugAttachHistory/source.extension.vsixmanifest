@@ -9,7 +9,7 @@
 				<ReleaseNotes>notes.txt</ReleaseNotes>
 				<Icon>bug.ico</Icon>
 				<PreviewImage>Resources\Preview.png</PreviewImage>
-				<Tags>debug,attach,attach to process,quick debug,remote debugging</Tags>
+				<Tags>debug;attach;attach to process;quick debug;remote debugging</Tags>
 		</Metadata>
 		<Installation InstalledByMsi="false">
 				<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
