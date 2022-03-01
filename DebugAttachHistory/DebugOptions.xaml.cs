@@ -113,7 +113,7 @@ namespace Karpach.DebugAttachManager
             lstSearchProcesses.ItemsSource =
                 _processes.Where(
                     p => p.ProcessName.ToLower().Contains(txtFilter.Text.ToLower()) 
-						|| searchPid && p.ProcessId.HasValue && string.Equals(p.ProcessId.Value.ToString(),txtFilter.Text, StringComparison.InvariantCultureIgnoreCase)
+						|| searchPid && p.ProcessId.HasValue && p.ProcessId.Value.ToString().StartsWith(txtFilter.Text, StringComparison.InvariantCultureIgnoreCase)
                          || searchCommandLine && p.CommandLine.ToLower().Contains(txtFilter.Text.ToLower())
                          || p.Title != null && p.Title.StartsWith(ProcessExt.TitlePrefix) && p.Title.ToLower().Contains(txtFilter.Text.ToLower()));
         }
