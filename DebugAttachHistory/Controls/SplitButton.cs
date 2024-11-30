@@ -139,7 +139,7 @@ namespace Karpach.DebugAttachManager.Controls
             MenuItem menuItem = e.OriginalSource as MenuItem;
 
             // To make the ButtonClickEvent get fired as we expected, you should mark the ClickEvent 
-            // as handled to prevent the event from poping up to the button portion of the SplitButton.
+            // as handled to prevent the event from popping up to the button portion of the SplitButton.
             if (menuItem != null && !(menuItem.Parent is MenuItem))
             {
                 e.Handled = true;                
