@@ -121,7 +121,7 @@
     <value>Debug Attach Manager</value>
   </data>
   <data name="112" xml:space="preserve">
-    <value>Extension provides extended abilities to attach Visual Studio debuger to web application pools, windows services and other processes.</value>
+    <value>Extension provides extended abilities to attach Visual Studio debugger to web application pools, windows services and other processes.</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="400" type="System.Resources.ResXFileRef, System.Windows.Forms">
