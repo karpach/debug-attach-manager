@@ -1,7 +1,4 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET
+name: Build VSIX Extension
 
 on:
   push:
@@ -15,14 +12,25 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Restore NuGet Packages
+        run: nuget restore DebugAttachHistory.sln
+
+      - name: Install Visual Studio Build Tools
+        run: |
+          choco install visualstudio2022buildtools --params "--add Microsoft.VisualStudio.Component.VSSDK"
+
+      - name: Locate MSBuild
+        id: locate-msbuild
+        run: |
+          $msbuildPath = &"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
+          echo "MSBUILD_EXE=$msbuildPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
+
+      - name: Build Solution
+        run: |
+          &"$env:MSBUILD_EXE" DebugAttachHistory.sln /p:Configuration=Release /p:Platform="Any CPU" /p:DeployExtension=false /m
