@@ -50,4 +50,4 @@ The extension also supports basic remote debugging:
 
 The logged-in user needs to have access to the remote PC. Optionally you can specify user name and password. 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/9mw67f51ocxiychg?svg=true)](https://ci.appveyor.com/project/karpach/debug-attach-manager)
+![badge-name](https://github.com/karpach/debug-attach-manager/actions/workflows/dotnet.yml/badge.svg)
