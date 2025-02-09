@@ -5,8 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+  <PropertyGroup>    
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -135,15 +134,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+	  <LogicalName>VSPackage.resources</LogicalName>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="VSPackage.resx">
-      <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
-    </EmbeddedResource>
+	  <ManifestResourceName>Resources</ManifestResourceName>
+    </EmbeddedResource>    
   </ItemGroup>
   <ItemGroup>
     <Content Include="bug.ico">
