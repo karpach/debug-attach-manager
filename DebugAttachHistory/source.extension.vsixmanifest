@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-		<Metadata>
-				<Identity Id="FA1028B5-FB96-4C67-BDE0-F4EA17CF9EE4" Version="2.4.220301.0" Language="en-US" Publisher="Viktar Karpach" />
-				<DisplayName>Debug Attach Manager</DisplayName>
-				<Description xml:space="preserve">Extension provides extended abilities to attach Visual Studio debugger to web application pools, windows services and other processes.</Description>
-				<MoreInfo>http://www.karpach.com</MoreInfo>
-				<License>Resources\LICENSE</License>
-				<ReleaseNotes>notes.txt</ReleaseNotes>
-				<Icon>bug.ico</Icon>
-				<PreviewImage>Resources\Preview.png</PreviewImage>
-				<Tags>debug;attach;attach to process;quick debug;remote debugging</Tags>
-		</Metadata>
-		<Installation InstalledByMsi="false">
-				<InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
-					<ProductArchitecture>amd64</ProductArchitecture>
-				</InstallationTarget>
-		</Installation>
-		<Dependencies>
-				<Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,]" />
-		</Dependencies>
-		<Assets>
-				<Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-		</Assets>
-		<Prerequisites>
-				<Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[12.0,)" DisplayName="Visual Studio core editor" />
-		</Prerequisites>
+    <Metadata>
+        <Identity Id="FA1028B5-FB96-4C67-BDE0-F4EA17CF9EE4" Version="2.4.240209.0" Language="en-US" Publisher="Viktar Karpach" />
+        <DisplayName>Debug Attach Manager</DisplayName>
+        <Description xml:space="preserve">Extension provides extended abilities to attach Visual Studio debugger to web application pools, windows services and other processes.</Description>
+        <MoreInfo>http://www.karpach.com</MoreInfo>
+        <License>Resources\LICENSE</License>
+        <ReleaseNotes>notes.txt</ReleaseNotes>
+        <Icon>bug.ico</Icon>
+        <PreviewImage>Resources\Preview.png</PreviewImage>
+        <Tags>debug;attach;attach to process;quick debug;remote debugging</Tags>
+    </Metadata>
+    <Installation InstalledByMsi="false">
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+            <ProductArchitecture>amd64</ProductArchitecture>
+        </InstallationTarget>
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,]" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[12.0,)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
 </PackageManifest>
