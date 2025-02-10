@@ -60,7 +60,7 @@ jobs:
         shell: pwsh
 
   release:
-    needs: build    
+    needs: build
     runs-on: ubuntu-latest
 
     steps:      
@@ -80,3 +80,37 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - name: Create GitHub Deployment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DEPLOYMENT_ID=$(gh api repos/${{ github.repository }}/deployments \
+            -f ref=${{ github.sha }} \
+            -f environment=production \
+            -f required_contexts='[]' \
+            --jq '.id')
+
+      - name: Publish release to marketplace
+        id: publish
+        uses: mrluje/vs-marketplace-publisher@v2
+        with:
+          pat: ${{ secrets.vs_pat }}
+          manifestPath: .marketplace/publishManifest.json
+          useLatestReleaseAsset: true
+      
+      - name: Update Deployment Status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/deployments/${{ env.DEPLOYMENT_ID }}/statuses \
+            -f state=success \
+            -f environment_url=https://marketplace.visualstudio.com/items?itemName=ViktarKarpach.DebugAttachManager2022
