@@ -50,4 +50,4 @@ The extension also supports basic remote debugging:
 
 The logged-in user needs to have access to the remote PC. Optionally you can specify user name and password. 
 
-![badge-name](https://github.com/karpach/debug-attach-manager/actions/workflows/dotnet.yml/badge.svg)
+![badge-name](https://github.com/karpach/debug-attach-manager/actions/workflows/build.yml/badge.svg)
