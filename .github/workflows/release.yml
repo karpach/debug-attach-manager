@@ -11,7 +11,8 @@ jobs:
   build:
 
     runs-on: windows-latest
-
+    outputs:
+      version: ${{ steps.get_version.outputs.VERSION }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -40,6 +41,7 @@ jobs:
         id: find-vsix
         run: |
           $vsixFile = Get-ChildItem -Path . -Recurse -Filter "*.vsix" | Select-Object -ExpandProperty FullName
+          echo $vsixFile
           echo "VSIX_PATH=$vsixFile" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8
         shell: pwsh
 
@@ -49,12 +51,19 @@ jobs:
           name: VSIX-Package
           path: ${{ env.VSIX_PATH }}
 
+      - name: Extract Extension Version
+        id: get_version
+        run: |
+          [xml]$xml = Get-Content "DebugAttachHistory/source.extension.vsixmanifest"
+          $version = $xml.PackageManifest.Metadata.Identity.Version
+          echo "VERSION=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8
+        shell: pwsh
+
   release:
-    needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build    
     runs-on: ubuntu-latest
 
-    steps:
+    steps:      
       - name: Download VSIX Artifact
         uses: actions/download-artifact@v4
         with:
@@ -65,8 +74,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: "*.vsix"
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          tag_name: v${{ needs.build.outputs.VERSION }}
+          name: Release v${{ needs.build.outputs.VERSION }}
           draft: false
           prerelease: false
         env:
