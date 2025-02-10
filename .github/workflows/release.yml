@@ -75,7 +75,7 @@ jobs:
         with:
           files: "*.vsix"
           tag_name: v${{ needs.build.outputs.VERSION }}
-          name: Release v${{ needs.build.outputs.VERSION }}
+          name: v${{ needs.build.outputs.VERSION }}
           draft: false
           prerelease: false
         env:
