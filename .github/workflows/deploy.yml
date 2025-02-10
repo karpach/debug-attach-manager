@@ -1,0 +1,52 @@
+name: Deploy VSIX Extension
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:    
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+          
+      - name: Create GitHub deployment
+        uses: chrnorm/deployment-action@v2
+        id: deployment
+        with:
+          token: '${{ github.token }}'
+          environment-url: https://marketplace.visualstudio.com/items?itemName=ViktarKarpach.DebugAttachManager2022
+          environment: production
+
+      - name: Download artifacts
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          file: 'DebugAttachHistory.vsix'
+
+      - name: Publish release to marketplace
+        shell: pwsh
+        run: |
+          $visualStudioInstallation = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VSSDK -property installationPath
+          $vsixPublisher = Join-Path $visualStudioInstallation 'VSSDK\VisualStudioIntegration\Tools\Bin\VsixPublisher.exe'          
+          $ManifestPath = ".\.marketplace\publishManifest.json"
+          $vsix = Get-ChildItem -File DebugAttachHistory.vsix -recurse | Select-Object -First 1 -ExpandProperty FullName
+          & $vsixPublisher publish -payload $vsix -publishManifest $ManifestPath -personalAccessToken ${{ secrets.vs_pat }}      
+      
+      - name: Update deployment status (success)
+        if: success()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: '${{ github.token }}'
+          environment-url: ${{ steps.deployment.outputs.environment_url }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: 'success'
+  
+      - name: Update deployment status (failure)
+        if: failure()
+        uses: chrnorm/deployment-status@v2
+        with:
+          token: '${{ github.token }}'
+          environment-url: ${{ steps.deployment.outputs.environment_url }}
+          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          state: 'failure'
