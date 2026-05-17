@@ -1,4 +1,6 @@
-﻿# Debug Attach Manager
+Updated ...
+ 
+ # Debug Attach Manager
 
 Download the extension at the  [VS Gallery](https://marketplace.visualstudio.com/items?itemName=ViktarKarpach.DebugAttachManager2022) or get the [nightly build](http://vsixgallery.com/extension/facf6f74-1cc6-44be-b57d-115d48b30021/).
 
